@@ -108,62 +108,9 @@ class DstarD0TTree : public edm::EDAnalyzer {
       void GenDstarInfo(const edm::Event& iEvent,const edm::EventSetup&);
       void GenD0Info(const edm::Event& iEvent,const edm::EventSetup&);
 
-//      void GapEventVariables(const edm::Event& iEvent,const edm::EventSetup&);
       void assignStableDaughters(const reco::Candidate* p, std::vector<int> & pids);
-//      void Gapside(const edm::Event& iEvent, const edm::EventSetup&);
-//      void resetPFThresholds(std::map<int,std::pair<double,double> >&);
-//      void setPFThresholds(std::map<int,std::pair<double,double> >&, edm::ParameterSet const&);
-//      void etaMaxMin(const edm::Event& iEvent, const edm::EventSetup&, std::map<int,std::map<int,std::pair<double,double> > > const& thresholdMap);
-
-//      void sumEHFTowers(const edm::Event&, const edm::EventSetup&);*/
       void TriggerInfo(const edm::Event&, const edm::EventSetup&);
       void initialize();
-
-/*      enum calo_region_t {Barrel,Endcap,Transition,Forward};
-
-      bool pflowThreshold(reco::PFCandidate const& part, std::map<int, std::map<int,std::pair<double,double> > > const& thresholdMap);
-
-      double MassColl(reco::PFCandidateCollection const& pflowCollection, std::map<int, std::map<int,std::pair<double,double> > > const& thresholdMap);
-
-      std::pair<double,double> xi(reco::PFCandidateCollection const& pflowCollection, double Ebeam, 
-                                  std::map<int, std::map<int,std::pair<double,double> > > const& thresholdMap);
-
-      std::pair<double,double> EPlusPz(reco::PFCandidateCollection const& pflowCollection, std::map<int, 
-                                       std::map<int,std::pair<double,double> > > const& thresholdMap);
-
-      std::pair<double,double> sumEHF(reco::PFCandidateCollection const& pflowCollection, std::map<int, 
-                                       std::map<int,std::pair<double,double> > > const& thresholdMap);
-
-      std::pair<double,double> etaMax(reco::PFCandidateCollection const& pflowCollection, std::map<int, 
-                                      std::map<int,std::pair<double,double> > > const& thresholdMap);
-
-
-
-
-      int pflowId(std::string const& name);
-
-      bool sortByEta( const math::XYZTLorentzVector& a, const math::XYZTLorentzVector& b);
-
-      void setGenInfo(reco::GenParticleCollection const&, double,
-                                                          math::XYZTLorentzVector&,
-                                                          math::XYZTLorentzVector&,
-                                                          math::XYZTLorentzVector&,
-                                                          math::XYZTLorentzVector&,
-                                                          math::XYZTLorentzVector&,
-                                                          math::XYZTLorentzVector&,
-                                                          math::XYZTLorentzVector&,
-                                                          math::XYZTLorentzVector&,
-                                                          math::XYZTLorentzVector&,
-                                                          math::XYZTLorentzVector&);
-
- 
-      double MassDissGen(reco::GenParticleCollection const& genParticles, double rangeEtaMin = -999.,
-                                                                          double rangeEtaMax = 999.);
-*/
-
-
-
-
 
       // ----------member data ---------------------------
 
@@ -171,7 +118,7 @@ class DstarD0TTree : public edm::EDAnalyzer {
       bool doMC, doRec;
       double pi_mass, k_mass;
       std::vector<int> dScandsKpi;
-     std::vector<reco::TransientTrack*>  goodTracks;
+      std::vector<reco::TransientTrack*>  goodTracks;
       std::vector<reco::TransientTrack*>goodTracksD0;
       std::vector<reco::TransientTrack*> slowPiTracks;
       std::vector<reco::TransientTrack> t_tks;

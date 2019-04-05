@@ -242,7 +242,7 @@ void DstarD0TTree::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 			//Fill Vector
 			reco::TransientTrack PionTT((*theB).build(iTrack1->pseudoTrack()));
 			cout << " PionTT "  << PionTT.track().momentum() << endl;
-			goodTracks.push_back(&(PionTT)); //Pion and kaon candidates Tracks with pt > 0.6 GeV/c
+			goodTracks.push_back(&PionTT); //Pion and kaon candidates Tracks with pt > 0.6 GeV/c
 
 			//}
 
@@ -261,19 +261,23 @@ cout << " goodTracks size " << goodTracks.size() << endl;
 ntracksDstar = slowPiTracks.size();
 ntracksD0Kpi = goodTracksD0.size();
 
+cout << "Reading good tracks" << endl;
+
+for(size_t i=0;i<goodTracks.size();i++)
+        {
+
+                for(size_t j=i+1;j<goodTracks.size();j++)
+                {
+                        //TransientTrack* trk2 = goodTracks.at(j);
+                        cout <<   goodTracks[i]->track().momentum() <<    goodTracks[j]->track().momentum() << endl;
+
+                   }
+}
 
 
 
-for(std::vector<TransientTrack>::const_iterator iTk = goodTracks.begin(); iTk != goodTracks.end(); iTk++){
 
-	std::cout  << " Out In Track charge " << iTk->charge() << " Num of RecHits " << iTk->recHitsSize() << " inner pt  " << sqrt(iTk->track().innerMomentum().perp2()) << "\n"; 
-
-
-} 
-
-
-
-RecDstar(iEvent,iSetup,RecVtx); //Reconstruction of D*
+//RecDstar(iEvent,iSetup,RecVtx); //Reconstruction of D*
 // RecD0(iEvent,iSetup,RecVtx);    //Reconstruction of prompt D0
 //FindAngle(RecVtx,v_D0,d0kpi_p4); //Calculates the opening angle
 //GenDstarInfo(iEvent,iSetup); //Stores information from D0 and its products.
@@ -300,7 +304,7 @@ void DstarD0TTree::RecDstar(const edm::Event& iEvent, const edm::EventSetup& iSe
 		for(size_t j=i+1;j<goodTracks.size();j++)
 		{			    
 			TransientTrack* trk2 = goodTracks.at(j);
-			// cout <<   goodTracks[i]->track().momentum() <<    goodTracks[j]->track().momentum() << endl;
+//			cout <<   goodTracks[i]->track().momentum() <<    goodTracks[j]->track().momentum() << endl;
 
 			// cout << " trk1->track().momentum() " << i << trk1->track().momentum() << " trk2->track().momentum() "<< j << trk2->track().momentum() <<endl;
 			if(trk1->charge() == trk2->charge()) continue;
