@@ -210,12 +210,13 @@ void DstarD0TTree::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 		if(iTrack1->pt()>0.3)
 		{
 			if(fabs(iTrack1->pdgId()) == 211)
-			{
-				reco::TransientTrack slowpionTT = theB->build(iTrack1->pseudoTrack());
-				if(slowpionTT.track().eta() > 2.1) continue;
-				if(slowpionTT.track().normalizedChi2() > 2.5) continue;
-				if(fabs(slowpionTT.track().dxy(RecVtx.position()))<0.1) continue;
-
+			{       //|dxy| < 0.1 cm, |dz| < 1 cm; χ2 < 2.5, Nhits > 5; pt > 0.15 GeV/c. 
+				if(iTrack1->pseudoTrack().normalizedChi2() > 2.5) continue;
+				if(iTrack1->pt()<0.15) continue;
+                                if(iTrack1->numberOfHits() < 5) continue;
+                                if(fabs(iTrack1->dxy())>0.1) continue;
+                                if(fabs(iTrack1->dz())>1.0) continue; 
+                                 reco::TransientTrack slowpionTT = theB->build(iTrack1->pseudoTrack()); 
 				//Fill Vector
 				slowPiTracks.push_back(slowpionTT);	
 			}
