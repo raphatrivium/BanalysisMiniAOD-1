@@ -113,17 +113,11 @@ DstarD0TTree::DstarD0TTree(const edm::ParameterSet& iConfig):
 	doMC(iConfig.getParameter<bool>("doMC")),
 	doRec(iConfig.getParameter<bool>("doRec")),
 
-	//trkToken_(consumes<reco::TrackCollection>(iConfig.getParameter<edm::InputTag>("tracks"))), //AOD
-	//trkToken_(consumes<pat::PackedCandidate>(iConfig.getParameter<edm::InputTag>("tracks"))), //MiniAOD
 	trkToken_(consumes<edm::View<pat::PackedCandidate>>(iConfig.getParameter<edm::InputTag>("tracks"))), //MiniAOD
 	vtxToken_(consumes<reco::VertexCollection>(iConfig.getParameter<edm::InputTag>("recVtxs"))),
-	//genParticlesToken_(consumes<edm::View<reco::GenParticleCollection> >(iConfig.getParameter<edm::InputTag>("genparticles"))),
-	//genParticlesTokenDstar_(consumes<GenParticleCollection>(iConfig.getParameter<edm::InputTag>("genParticles"))),
-	//genParticlesTokenD0_(consumes<GenParticleCollection>(iConfig.getParameter<edm::InputTag>("genParticles"))),
 
 
-	comEnergy_(iConfig.getParameter<double>("comEnergy")),
-	energyScaleHCAL_(-1.)
+	comEnergy_(iConfig.getParameter<double>("comEnergy"))
 {
 	Ebeam_ = comEnergy_/2.;
 	edm::Service<TFileService> fs;
@@ -195,20 +189,12 @@ void DstarD0TTree::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	PVerry=RecVtx.yError();
 	PVerrz=RecVtx.zError();
 
-	// Getting tracks from vert(ex)ices
-	// AOD
-	//	edm::Handle<TrackCollection> tracks; //access that TrackCollection
-	//	iEvent.getByToken(trkToken_,tracks);
 
 	// Getting tracks from vert(ex)ices
 	// MiniAOD
 	edm::Handle< View < pat::PackedCandidate >> tracks; //access that PackedCandidate
 	iEvent.getByToken(trkToken_,tracks);
 
-	//AOD
-	//edm::ESHandle<TransientTrackBuilder> theB;
-	//iSetup.get<TransientTrackRecord>().get("TransientTrackBuilder",theB);
-	//t_tks = (*theB).build(tracks);
 
 	//miniAOD
 	edm::ESHandle<TransientTrackBuilder> theB; 
@@ -225,13 +211,13 @@ void DstarD0TTree::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 		{
 			if(fabs(iTrack1->pdgId()) == 211)
 			{
-				reco::TransientTrack slowpionTT((*theB).build(iTrack1->pseudoTrack()));
+				reco::TransientTrack slowpionTT = theB->build(iTrack1->pseudoTrack());
 				if(slowpionTT.track().eta() > 2.1) continue;
 				if(slowpionTT.track().normalizedChi2() > 2.5) continue;
 				if(fabs(slowpionTT.track().dxy(RecVtx.position()))<0.1) continue;
 
 				//Fill Vector
-				slowPiTracks.push_back(&(slowpionTT));	
+				slowPiTracks.push_back(slowpionTT);	
 			}
 
 		}
@@ -240,9 +226,12 @@ void DstarD0TTree::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 		{
 			if(iTrack1->pseudoTrack().hitPattern().numberOfValidHits() < 5) continue;
 			//Fill Vector
-			reco::TransientTrack PionTT((*theB).build(iTrack1->pseudoTrack()));
-			cout << " PionTT "  << PionTT.track().momentum() << endl;
-			goodTracks.push_back(&PionTT); //Pion and kaon candidates Tracks with pt > 0.6 GeV/c
+			//TransientTrack tt = theTTBuilder->build(el->gsfTrack());
+			// reco::TransientTrack PionTT((*theB).build(iTrack1->pseudoTrack()));
+			//
+			reco::TransientTrack  PionTT = theB->build(iTrack1->pseudoTrack());
+			//cout << " PionTT "  << PionTT.track().momentum() << endl;
+			goodTracks.push_back(PionTT); //Pion and kaon candidates Tracks with pt > 0.6 GeV/c
 
 			//}
 
@@ -260,7 +249,7 @@ void DstarD0TTree::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 cout << " goodTracks size " << goodTracks.size() << endl;
 ntracksDstar = slowPiTracks.size();
 ntracksD0Kpi = goodTracksD0.size();
-
+/*
 cout << "Reading good tracks" << endl;
 
 for(size_t i=0;i<goodTracks.size();i++)
@@ -269,15 +258,15 @@ for(size_t i=0;i<goodTracks.size();i++)
                 for(size_t j=i+1;j<goodTracks.size();j++)
                 {
                         //TransientTrack* trk2 = goodTracks.at(j);
-                        cout <<   goodTracks[i]->track().momentum() <<    goodTracks[j]->track().momentum() << endl;
+                        cout <<   goodTracks[i].track().momentum() <<    goodTracks[j].track().momentum() << endl;
 
                    }
 }
 
+*/
 
 
-
-//RecDstar(iEvent,iSetup,RecVtx); //Reconstruction of D*
+RecDstar(iEvent,iSetup,RecVtx); //Reconstruction of D*
 // RecD0(iEvent,iSetup,RecVtx);    //Reconstruction of prompt D0
 //FindAngle(RecVtx,v_D0,d0kpi_p4); //Calculates the opening angle
 //GenDstarInfo(iEvent,iSetup); //Stores information from D0 and its products.
@@ -297,51 +286,54 @@ void DstarD0TTree::RecDstar(const edm::Event& iEvent, const edm::EventSetup& iSe
 
 	for(size_t i=0;i<goodTracks.size();i++)
 	{  
-		// cout << " RecDstar goodTracks size " << goodTracks.size() << endl;
+		 cout << " RecDstar goodTracks size " << goodTracks.size() << endl;
 
-		TransientTrack* trk1 = goodTracks.at(i);
+		TransientTrack trk1 =  goodTracks[i];
 
 		for(size_t j=i+1;j<goodTracks.size();j++)
 		{			    
-			TransientTrack* trk2 = goodTracks.at(j);
-//			cout <<   goodTracks[i]->track().momentum() <<    goodTracks[j]->track().momentum() << endl;
+			TransientTrack trk2 = goodTracks[j];
+			//cout <<   goodTracks[i].track().momentum() <<    goodTracks[j].track().momentum() << endl;
 
-			// cout << " trk1->track().momentum() " << i << trk1->track().momentum() << " trk2->track().momentum() "<< j << trk2->track().momentum() <<endl;
-			if(trk1->charge() == trk2->charge()) continue;
-			cout<< "OP Charge test" <<endl;
-
+			if(trk1.charge() == trk2.charge()) continue;
+			cout<< "OP Charge for two good tracks(px,py,pz)" <<endl;
+                        cout <<   trk1.track().momentum() <<    trk2.track().momentum() << endl;
 			//D0 momentum Reconstruction
-			math::XYZVector D0fromDstar_p = trk1->track().momentum() + trk2->track().momentum();
+			math::XYZVector D0fromDstar_p = trk1.track().momentum() + trk2.track().momentum();
+			
+			if(sqrt(D0fromDstar_p.perp2()) < 3.) continue;//{
 
-			if(sqrt(D0fromDstar_p.perp2()) < 3.) continue; //perp2->transverse component squared
+                         cout << "sqrt(D0fromDstar_p.perp2())"<< sqrt(D0fromDstar_p.perp2()) <<endl;    
 
 			for(size_t k=0;k<slowPiTracks.size();k++)
 			{
-				TransientTrack* trkS = slowPiTracks.at(k);
+				TransientTrack trkS = slowPiTracks[k];
 
-				if(*trkS == *trk1 || *trkS == *trk2) continue;
+                                 cout << "Slow Pions Tracks(px,py,pz): "  << trkS.track().momentum() << endl;                
+
+				if(trkS == trk1 || trkS == trk2) continue;
 
 				//D* momentum Reconstruction
-				math::XYZVector DS_p = D0fromDstar_p + trkS->track().momentum();
+				math::XYZVector DS_p = D0fromDstar_p + trkS.track().momentum();
 				if(sqrt(DS_p.perp2())<4.) continue;
-
+                                  cout << "sqrt(DS_p.perp2()): "<< sqrt(DS_p.perp2()) <<endl;
 				TransientTrack *K=0,*pi=0;
 
 				//Right Combination Charges
-				if(trk1->charge() == trkS->charge())
+				if(trk1.charge() == trkS.charge())
 				{
-					K = trk2;
-					pi = trk1;
+					*K = trk2;
+					*pi = trk1;
 				}
 				else
 				{
-					K = trk1;
-					pi = trk2;
+					*K = trk1;
+					*pi = trk2;
 				}		
 
 				//Combinações erradas dcarga - background
 				/*
-				   if(trk1->charge() == trkS->charge()){
+				   if(trk1->charge() == trkS.charge()){
 				   pi = trk2;
 				   K = trk1;
 				   }
@@ -359,7 +351,7 @@ void DstarD0TTree::RecDstar(const edm::Event& iEvent, const edm::EventSetup& iSe
 				if( fabs(ip4_D0.M()-1.86484)  > 1.) continue;
 
 				//D* 4-momentum Reconstruction
-				math::XYZTLorentzVector p4_S(trkS->track().px(),trkS->track().py(),trkS->track().pz(),sqrt(pow(trkS->track().p(),2)+pow(pi_mass,2)));
+				math::XYZTLorentzVector p4_S(trkS.track().px(),trkS.track().py(),trkS.track().pz(),sqrt(pow(trkS.track().p(),2)+pow(pi_mass,2)));
 				math::XYZTLorentzVector ip4_DS = ip4_D0 + p4_S;
 				if((ip4_DS.M() - ip4_D0.M()) > 0.3) continue;
 
@@ -412,45 +404,46 @@ void DstarD0TTree::RecDstar(const edm::Event& iEvent, const edm::EventSetup& iSe
 
 				TrkKdxy.push_back(K_f.track().dxy(RecVtx.position()));
 				Trkpidxy.push_back(pi_f.track().dxy(RecVtx.position()));
-				TrkSdxy.push_back(trkS->track().dxy(RecVtx.position()));
+				TrkSdxy.push_back(trkS.track().dxy(RecVtx.position()));
 
 				TrkKdz.push_back(K_f.track().dz(RecVtx.position()));
 				Trkpidz.push_back(pi_f.track().dz(RecVtx.position()));
-				TrkSdz.push_back(trkS->track().dz(RecVtx.position()));
+				TrkSdz.push_back(trkS.track().dz(RecVtx.position()));
 
 				TrkKnhits.push_back(K->track().numberOfValidHits());
 				Trkpinhits.push_back(pi->track().numberOfValidHits());
-				TrkSnhits.push_back(trkS->track().numberOfValidHits());
+				TrkSnhits.push_back(trkS.track().numberOfValidHits());
 
 				TrkKchi2.push_back(K->track().normalizedChi2());
 				Trkpichi2.push_back(pi->track().normalizedChi2());
-				TrkSchi2.push_back(trkS->track().normalizedChi2());
+				TrkSchi2.push_back(trkS.track().normalizedChi2());
 
-				DSDeltaR.push_back(deltaR(d0_p4.eta(),d0_p4.phi(),trkS->track().eta(),trkS->track().phi()));
+				DSDeltaR.push_back(deltaR(d0_p4.eta(),d0_p4.phi(),trkS.track().eta(),trkS.track().phi()));
 
 				TrkKpt.push_back(K_f.track().pt());
 				Trkpipt.push_back(pi_f.track().pt());
-				TrkSpt.push_back(trkS->track().pt());
+				TrkSpt.push_back(trkS.track().pt());
 
 				TrkKeta.push_back(K_f.track().eta());
 				Trkpieta.push_back(pi_f.track().eta());
-				TrkSeta.push_back(trkS->track().eta());
+				TrkSeta.push_back(trkS.track().eta());
 
 				TrkKphi.push_back(K_f.track().phi());
 				Trkpiphi.push_back(pi_f.track().phi());
-				TrkSphi.push_back(trkS->track().phi());
+				TrkSphi.push_back(trkS.track().phi());
 
-				TrkScharge.push_back(trkS->charge());
+				TrkScharge.push_back(trkS.charge());
 
 				D0fromDSsXY_vec.push_back(D0fromDSsXY);     
-
+                               
 				NKpiCand++;  
-
+						
 				if(NKpiCand>999) break;
 			}
 			if(NKpiCand>999) break;
-		} 
-		if(NKpiCand>999) break;
+           //}else {break;}	
+	 } 
+	if(NKpiCand>999) break;
 	}
 }//End RecDstar
 

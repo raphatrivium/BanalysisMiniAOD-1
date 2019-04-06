@@ -93,124 +93,111 @@
 //
 
 class DstarD0TTree : public edm::EDAnalyzer {
-   public:
-      explicit DstarD0TTree(const edm::ParameterSet&);
-      ~DstarD0TTree();
-      void RecDstar(const edm::Event& iEvent, const edm::EventSetup&, const reco::Vertex& RecVtx);
-      void RecD0(const edm::Event& iEvent, const edm::EventSetup&, const reco::Vertex& RecVtx);
-      double FindAngle(const reco::Vertex& , const TransientVertex& , const math::XYZTLorentzVector& ) ;
-	  //double FindAngleMCpromptD0(const GenParticle&);
+	public:
+		explicit DstarD0TTree(const edm::ParameterSet&);
+		~DstarD0TTree();
+		void RecDstar(const edm::Event& iEvent, const edm::EventSetup&, const reco::Vertex& RecVtx);
+		void RecD0(const edm::Event& iEvent, const edm::EventSetup&, const reco::Vertex& RecVtx);
+		double FindAngle(const reco::Vertex& , const TransientVertex& , const math::XYZTLorentzVector& ) ;
+		//double FindAngleMCpromptD0(const GenParticle&);
 
-   private:
+	private:
 
-      virtual void beginJob() ;
-      virtual void analyze(const edm::Event&, const edm::EventSetup&);
-      void GenDstarInfo(const edm::Event& iEvent,const edm::EventSetup&);
-      void GenD0Info(const edm::Event& iEvent,const edm::EventSetup&);
+		virtual void beginJob() ;
+		virtual void analyze(const edm::Event&, const edm::EventSetup&);
+		void GenDstarInfo(const edm::Event& iEvent,const edm::EventSetup&);
+		void GenD0Info(const edm::Event& iEvent,const edm::EventSetup&);
 
-      void assignStableDaughters(const reco::Candidate* p, std::vector<int> & pids);
-      void TriggerInfo(const edm::Event&, const edm::EventSetup&);
-      void initialize();
+		void assignStableDaughters(const reco::Candidate* p, std::vector<int> & pids);
+		void TriggerInfo(const edm::Event&, const edm::EventSetup&);
+		void initialize();
 
-      // ----------member data ---------------------------
-
-
-      bool doMC, doRec;
-      double pi_mass, k_mass;
-      std::vector<int> dScandsKpi;
-      std::vector<reco::TransientTrack*>  goodTracks;
-      std::vector<reco::TransientTrack*>goodTracksD0;
-      std::vector<reco::TransientTrack*> slowPiTracks;
-      std::vector<reco::TransientTrack> t_tks;
-      std::vector<reco::TransientTrack> tksD0;
-
-      TTree *data;
-
-      //edm::EDGetTokenT<reco::TrackCollection> trkToken_; //AOD
-      edm::EDGetTokenT<edm::View<pat::PackedCandidate>> trkToken_; //MiniAOD
-      edm::EDGetTokenT<reco::VertexCollection> vtxToken_;
-
-      edm::EDGetTokenT<reco::GenParticleCollection> genParticlesTokenDstar_;
-      edm::EDGetTokenT<reco::GenParticleCollection> genParticlesTokenD0_;
+		// ----------member data ---------------------------
 
 
-      //edm::EDGetTokenT<reco::GenParticleCollection> genParticlesToken_;
-	  //edm::EDGetTokenT<edm::View<reco::GenParticle> > genParticlesToken_;
+		bool doMC, doRec;
+		double pi_mass, k_mass;
+		std::vector<int> dScandsKpi;
+		std::vector<reco::TransientTrack>  goodTracks;
+		std::vector<reco::TransientTrack*>  goodTracksD0;
+		std::vector<reco::TransientTrack> slowPiTracks;
+		std::vector<reco::TransientTrack> t_tks;
+		std::vector<reco::TransientTrack> tksD0;
 
-	
+		TTree *data;
 
-      TransientVertex v_D0;
-      math::XYZTLorentzVector d0kpi_p4;
+		edm::EDGetTokenT<edm::View<pat::PackedCandidate>> trkToken_; //MiniAOD
+		edm::EDGetTokenT<reco::VertexCollection> vtxToken_;
 
-      edm::InputTag particleFlowTag_;
-
-
-      //Diffractive analysis
-      double energyThresholdHB_;
-      double energyThresholdHE_;
-      double energyThresholdHF_;
-      double Ebeam_;
-      double comEnergy_;
-      //double Ebeam_;
-      bool applyEnergyScaleHCAL_;
-      double energyScaleHCAL_;
-
-      std::map<int,std::pair<double,double> > thresholdsPFlowBarrel_;
-      std::map<int,std::pair<double,double> > thresholdsPFlowEndcap_;
-      std::map<int,std::pair<double,double> > thresholdsPFlowTransition_;
-      std::map<int,std::pair<double,double> > thresholdsPFlowForward_;
-      std::map<int,std::map<int,std::pair<double,double> > > thresholdsPFlow_;
-
-      std::string hltPathName_;	
-      std::vector<std::string> triggers;
- 
-      //std::string hltPathName_; 
-      int TTBit_8,TTBit_9,TTBit_10,TTBit_32,TTBit_33,TTBit_34; 
-
-      bool signalpf;      
-
-      int procId;
-      int nHFPlus;
-      int nHFMinus;
-
-      int runNumber,eventNumber,lumi;
-
-      int ND0KpiCand, NKpiCand,D0Candidates,DsCandidates,NdsKpiMC,FlagMC,FlagRec,n_pVertex,ntracksD0Kpi,ntracksDstar,HLTPath_,TTBit_;   
-
-      double PVx,PVy,PVz,PVerrx,PVerry,PVerrz,lumiWeight_;  
-      double HFEnergyMinus,HFEnergyPlus;
-      TLorentzVector vD0_1, vD0_2, vD0kaon, vD0pion;
-      double mass1, mass2;
-      bool comb1, comb2, combOR;     
-     // std::vector<int> FlagMC;
-
-      std::vector<double> D0Kpi_VtxProb,D0Kpipt,D0Kpieta,D0Kpiphi,D0Kpi_VtxPosx,D0Kpi_VtxPosy,D0Kpi_VtxPosz,D0Kpi_Vtxerrx,D0Kpi_Vtxerry,D0Kpi_Vtxerrz,D0Kpi_DispAngle;
-      std::vector<double> D0Kpimass,TrkD0Keta,TrkD0pieta,TrkD0Kphi,TrkD0piphi;
-      std::vector<double> TrkD0Kdxy,TrkD0pidxy,TrkD0Kdz,TrkD0pidz,TrkD0Knhits,TrkD0pinhits,TrkD0Kchi2,TrkD0pichi2,D0DeltaR,TrkD0Kpt,TrkD0pipt,D0KpisXY_vec,D0Kpis3D_vec,D0_kT_vec;
+		edm::EDGetTokenT<reco::GenParticleCollection> genParticlesTokenDstar_;
+		edm::EDGetTokenT<reco::GenParticleCollection> genParticlesTokenD0_;
 
 
-      std::vector<double> D0_VtxProb,D0pt,Dspt,D0eta,Dseta,D0phi,Dsphi,D0_VtxPosx,D0_VtxPosy,D0_VtxPosz,D0_Vtxerrx,D0_Vtxerry,D0_Vtxerrz,TrkKdxy;
-      std::vector<double> Dsmass,Trkpidxy,TrkSdxy,TrkKdz,Trkpidz,TrkSdz,TrkKnhits,Trkpinhits,TrkSnhits,TrkKchi2,Trkpichi2,TrkSchi2,DSDeltaR,TrkKpt,Trkpipt;
-      std::vector<double> D0mass,TrkSpt,TrkKeta,Trkpieta,TrkSeta,TrkKphi,Trkpiphi,TrkSphi,TrkScharge,D0fromDSsXY_vec;
+		//edm::EDGetTokenT<reco::GenParticleCollection> genParticlesToken_;
+		//edm::EDGetTokenT<edm::View<reco::GenParticle> > genParticlesToken_;
 
-      std::vector<double> MxFromPFCands_,EPlusPzFromPFCands_,EMinusPzFromPFCands_,sumEHFPlusFromPFCands_,sumEHFMinusFromPFCands_;
-      std::vector<double> xiPlusFromPFCands_,xiMinusFromPFCands_,etaMaxFromPFCands_,etaMinFromPFCands_;
-      std::vector<double> etaMaxFromPFCandsNew_,etaMinFromPFCandsNew_,missingMassFromXiFromPFCands_;
 
-      std::vector<double> MCDseta,MCDsphi,MCDspt,MCDsenergy,MCDsp,MCDset,MCDsrapidity,MCDsmass;
-      std::vector<double> MCD0eta,MCD0phi,MCD0pt,MCD0energy,MCD0p,MCD0et,MCD0rapidity,MCD0mass;
 
-      std::vector<double> MCpromptD0eta,MCpromptD0phi,MCpromptD0pt,MCpromptD0energy,MCpromptD0p,MCpromptD0et,MCpromptD0rapidity,MCpromptD0mass;
-      std::vector<double> MCpromptD0_Keta,MCpromptD0_Kphi,MCpromptD0_Kpt,MCpromptD0_Kenergy,MCpromptD0_Kp,MCpromptD0_Ket,MCpromptD0_Krapidity,MCpromptD0_Kmass;
-      std::vector<double> MCpromptD0_Pieta,MCpromptD0_Piphi,MCpromptD0_Pipt,MCpromptD0_Pienergy,MCpromptD0_Pip,MCpromptD0_Piet,MCpromptD0_Pirapidity,MCpromptD0_Pimass;
+		TransientVertex v_D0;
+		math::XYZTLorentzVector d0kpi_p4;
 
-	  std::vector<double> MCpromptD0_DispAngle,MCpromptD0_Kt;
+		edm::InputTag particleFlowTag_;
 
- //      std::vector<double> xiGenPlus_,xiGenMinus_,MxGen_,MxGenRange_,sumEnergyHEPlusGen_,sumEnergyHEMinusGen_,sumEnergyHFPlusGen_;
- //    std::vector<double> sumEnergyHFMinusGen_,etaMaxGen_,etaMinGen_,deltaEtaGen_,etaGapLow_,etaGapHigh_,MxGenPlus_,MxGenMinus_;
 
-      std::vector<double> pfsis1Eta_max,pfsis2Eta_max,pfsis1Eta_min,pfsis2Eta_min,deltaEtapf;
+		double Ebeam_;
+		double comEnergy_;
 
- };
+
+		std::string hltPathName_;	
+		std::vector<std::string> triggers;
+
+		//std::string hltPathName_; 
+		int TTBit_8,TTBit_9,TTBit_10,TTBit_32,TTBit_33,TTBit_34; 
+
+		bool signalpf;      
+
+		int procId;
+		int nHFPlus;
+		int nHFMinus;
+
+		int runNumber,eventNumber,lumi;
+
+		int ND0KpiCand, NKpiCand,D0Candidates,DsCandidates,NdsKpiMC,FlagMC,FlagRec,n_pVertex,ntracksD0Kpi,ntracksDstar,HLTPath_,TTBit_;   
+
+		double PVx,PVy,PVz,PVerrx,PVerry,PVerrz,lumiWeight_;  
+		double HFEnergyMinus,HFEnergyPlus;
+		TLorentzVector vD0_1, vD0_2, vD0kaon, vD0pion;
+		double mass1, mass2;
+		bool comb1, comb2, combOR;     
+		// std::vector<int> FlagMC;
+
+		std::vector<double> D0Kpi_VtxProb,D0Kpipt,D0Kpieta,D0Kpiphi,D0Kpi_VtxPosx,D0Kpi_VtxPosy,D0Kpi_VtxPosz,D0Kpi_Vtxerrx,D0Kpi_Vtxerry,D0Kpi_Vtxerrz,D0Kpi_DispAngle;
+		std::vector<double> D0Kpimass,TrkD0Keta,TrkD0pieta,TrkD0Kphi,TrkD0piphi;
+		std::vector<double> TrkD0Kdxy,TrkD0pidxy,TrkD0Kdz,TrkD0pidz,TrkD0Knhits,TrkD0pinhits,TrkD0Kchi2,TrkD0pichi2,D0DeltaR,TrkD0Kpt,TrkD0pipt,D0KpisXY_vec,D0Kpis3D_vec,D0_kT_vec;
+
+
+		std::vector<double> D0_VtxProb,D0pt,Dspt,D0eta,Dseta,D0phi,Dsphi,D0_VtxPosx,D0_VtxPosy,D0_VtxPosz,D0_Vtxerrx,D0_Vtxerry,D0_Vtxerrz,TrkKdxy;
+		std::vector<double> Dsmass,Trkpidxy,TrkSdxy,TrkKdz,Trkpidz,TrkSdz,TrkKnhits,Trkpinhits,TrkSnhits,TrkKchi2,Trkpichi2,TrkSchi2,DSDeltaR,TrkKpt,Trkpipt;
+		std::vector<double> D0mass,TrkSpt,TrkKeta,Trkpieta,TrkSeta,TrkKphi,Trkpiphi,TrkSphi,TrkScharge,D0fromDSsXY_vec;
+
+		std::vector<double> MxFromPFCands_,EPlusPzFromPFCands_,EMinusPzFromPFCands_,sumEHFPlusFromPFCands_,sumEHFMinusFromPFCands_;
+		std::vector<double> xiPlusFromPFCands_,xiMinusFromPFCands_,etaMaxFromPFCands_,etaMinFromPFCands_;
+		std::vector<double> etaMaxFromPFCandsNew_,etaMinFromPFCandsNew_,missingMassFromXiFromPFCands_;
+
+		std::vector<double> MCDseta,MCDsphi,MCDspt,MCDsenergy,MCDsp,MCDset,MCDsrapidity,MCDsmass;
+		std::vector<double> MCD0eta,MCD0phi,MCD0pt,MCD0energy,MCD0p,MCD0et,MCD0rapidity,MCD0mass;
+
+		std::vector<double> MCpromptD0eta,MCpromptD0phi,MCpromptD0pt,MCpromptD0energy,MCpromptD0p,MCpromptD0et,MCpromptD0rapidity,MCpromptD0mass;
+		std::vector<double> MCpromptD0_Keta,MCpromptD0_Kphi,MCpromptD0_Kpt,MCpromptD0_Kenergy,MCpromptD0_Kp,MCpromptD0_Ket,MCpromptD0_Krapidity,MCpromptD0_Kmass;
+		std::vector<double> MCpromptD0_Pieta,MCpromptD0_Piphi,MCpromptD0_Pipt,MCpromptD0_Pienergy,MCpromptD0_Pip,MCpromptD0_Piet,MCpromptD0_Pirapidity,MCpromptD0_Pimass;
+
+		std::vector<double> MCpromptD0_DispAngle,MCpromptD0_Kt;
+
+		//      std::vector<double> xiGenPlus_,xiGenMinus_,MxGen_,MxGenRange_,sumEnergyHEPlusGen_,sumEnergyHEMinusGen_,sumEnergyHFPlusGen_;
+		//    std::vector<double> sumEnergyHFMinusGen_,etaMaxGen_,etaMinGen_,deltaEtaGen_,etaGapLow_,etaGapHigh_,MxGenPlus_,MxGenMinus_;
+
+		std::vector<double> pfsis1Eta_max,pfsis2Eta_max,pfsis1Eta_min,pfsis2Eta_min,deltaEtapf;
+
+};
 #endif 
-	
+

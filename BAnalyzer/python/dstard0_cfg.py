@@ -11,7 +11,7 @@ process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condD
 process.GlobalTag.globaltag = "101X_dataRun2_Prompt_v9"
 
 #number of events (-1 -> all)
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(1000))
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(1))
 
 process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True),
 IgnoreCompletely = cms.untracked.vstring('ProductNotFound'),
