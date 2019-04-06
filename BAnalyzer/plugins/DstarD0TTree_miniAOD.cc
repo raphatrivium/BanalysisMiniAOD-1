@@ -226,28 +226,27 @@ void DstarD0TTree::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 		if((iTrack1->pt()>0.6) && (fabs(iTrack1->pdgId()) == 211))
 		{
 			if(iTrack1->pseudoTrack().hitPattern().numberOfValidHits() < 5) continue;
-			//Fill Vector
-			//TransientTrack tt = theTTBuilder->build(el->gsfTrack());
-			// reco::TransientTrack PionTT((*theB).build(iTrack1->pseudoTrack()));
-			//
+			//Pion and kaon candidates Tracks with pt > 0.6 GeV/c
+			
 			reco::TransientTrack  PionTT = theB->build(iTrack1->pseudoTrack());
 			//cout << " PionTT "  << PionTT.track().momentum() << endl;
 			goodTracks.push_back(PionTT); //Pion and kaon candidates Tracks with pt > 0.6 GeV/c
 
-			//}
+	        }
+		// SELECTING TRACKS FOR D0 ,  χ2 < 5.0, Nhits > 5; pt > 0.15 GeV/c, p > 1.0 GeV/c, |dz| < 0.5 cm; |dxy| < 0.1 cm	i             
+		if(fabs(iTrack1->eta())<2.5 && iTrack1->pseudoTrack().normalizedChi2() < 5.0 && iTrack1->pseudoTrack().hitPattern().numberOfValidHits() >= 5 && iTrack1->pt() > 0.5
+&& iTrack1->p() >1.0 && fabs(iTrack1->dz())<0.5 && fabs(iTrack1->dxy())<0.1)
+                {
 
-			//if(fabs(iTrack1->pdgId()) !=211)
-			//{
-			//reco::TransientTrack KaonTT((*theB).build(iTrack1->pseudoTrack()));
-			//if(KaonTT.track().numberOfValidHits() < 5) continue;
-			//Fill Vector
-			//}
-	}
-
-}
+                 reco::TransientTrack  D0TT = theB->build(iTrack1->pseudoTrack());
+               //  goodTracksD0.push_back(D0TT);
+		}
 
 
-cout << " goodTracks size " << goodTracks.size() << endl;
+   }//loop packed candidates
+
+
+//cout << " goodTracks size " << goodTracks.size() << endl;
 ntracksDstar = slowPiTracks.size();
 ntracksD0Kpi = goodTracksD0.size();
 /*
@@ -284,10 +283,9 @@ void DstarD0TTree::RecDstar(const edm::Event& iEvent, const edm::EventSetup& iSe
 	using namespace std;
 	using namespace reco;
 	using namespace edm;
-
+             cout << " RecDstar using goodTracks is " << goodTracks.size() << endl;
 	for(size_t i=0;i<goodTracks.size();i++)
 	{  
-		 cout << " RecDstar goodTracks size " << goodTracks.size() << endl;
 
 		TransientTrack trk1 =  goodTracks[i];
 
@@ -297,56 +295,46 @@ void DstarD0TTree::RecDstar(const edm::Event& iEvent, const edm::EventSetup& iSe
 			//cout <<   goodTracks[i].track().momentum() <<    goodTracks[j].track().momentum() << endl;
 
 			if(trk1.charge() == trk2.charge()) continue;
-			cout<< "OP Charge for two good tracks(px,py,pz)" <<endl;
-                        cout <<   trk1.track().momentum() <<    trk2.track().momentum() << endl;
+			//cout<< "OP Charge for two good tracks(px,py,pz)" <<endl;
+                        //cout <<   trk1.track().momentum() <<    trk2.track().momentum() << endl;
 			//D0 momentum Reconstruction
 			math::XYZVector D0fromDstar_p = trk1.track().momentum() + trk2.track().momentum();
 			
 			if(sqrt(D0fromDstar_p.perp2()) < 3.) continue;//{
 
-                         cout << "sqrt(D0fromDstar_p.perp2())"<< sqrt(D0fromDstar_p.perp2()) <<endl;    
+                         //cout << "sqrt(D0fromDstar_p.perp2())"<< sqrt(D0fromDstar_p.perp2()) <<endl;    
 
 			for(size_t k=0;k<slowPiTracks.size();k++)
 			{
 				TransientTrack trkS = slowPiTracks[k];
 
-                                 cout << "Slow Pions Tracks(px,py,pz): "  << trkS.track().momentum() << endl;                
+                                 //cout << "Slow Pions Tracks(px,py,pz): "  << trkS.track().momentum() << endl;                
 
 				if(trkS == trk1 || trkS == trk2) continue;
 
 				//D* momentum Reconstruction
 				math::XYZVector DS_p = D0fromDstar_p + trkS.track().momentum();
 				if(sqrt(DS_p.perp2())<4.) continue;
-                                  cout << "sqrt(DS_p.perp2()): "<< sqrt(DS_p.perp2()) <<endl;
-				TransientTrack *K=0,*pi=0;
-
+                                 // cout << "sqrt(DS_p.perp2()): "<< sqrt(DS_p.perp2()) <<endl;
+				TransientTrack K;
+				TransientTrack pi;
+                                
 				//Right Combination Charges
 				if(trk1.charge() == trkS.charge())
-				{
-					*K = trk2;
-					*pi = trk1;
+				{ //  cout << "Right Combination Charges" << endl;
+					K = trk2;
+					pi = trk1;
 				}
 				else
 				{
-					*K = trk1;
-					*pi = trk2;
+					K = trk1;
+					pi = trk2;
 				}		
 
-				//Combinações erradas dcarga - background
-				/*
-				   if(trk1->charge() == trkS.charge()){
-				   pi = trk2;
-				   K = trk1;
-				   }
-				   else{
-				   pi = trk1;
-				   K = trk2;
-				   }
-				   */
-
+                                
 				//D0 4-momentum Reconstruction
-				math::XYZTLorentzVector ip4_K(K->track().px(),K->track().py(),K->track().pz(),sqrt(pow(K->track().p(),2)+pow(k_mass,2)));
-				math::XYZTLorentzVector ip4_pi(pi->track().px(),pi->track().py(),pi->track().pz(),sqrt(pow(pi->track().p(),2)+pow(pi_mass,2)));        
+				math::XYZTLorentzVector ip4_K(K.track().px(),K.track().py(),K.track().pz(),sqrt(pow(K.track().p(),2)+pow(k_mass,2)));
+				math::XYZTLorentzVector ip4_pi(pi.track().px(),pi.track().py(),pi.track().pz(),sqrt(pow(pi.track().p(),2)+pow(pi_mass,2)));        
 				math::XYZTLorentzVector ip4_D0 = ip4_K + ip4_pi;
 
 				if( fabs(ip4_D0.M()-1.86484)  > 1.) continue;
@@ -355,17 +343,18 @@ void DstarD0TTree::RecDstar(const edm::Event& iEvent, const edm::EventSetup& iSe
 				math::XYZTLorentzVector p4_S(trkS.track().px(),trkS.track().py(),trkS.track().pz(),sqrt(pow(trkS.track().p(),2)+pow(pi_mass,2)));
 				math::XYZTLorentzVector ip4_DS = ip4_D0 + p4_S;
 				if((ip4_DS.M() - ip4_D0.M()) > 0.3) continue;
-
+                                //  cout << "ip4_DS.M() :" << ip4_DS.M() << " ip4_D0.M(): " << ip4_D0.M() << endl;
+                                
 				//vertexing
 				vector<TransientTrack> tks;
-				tks.push_back(*K);
-				tks.push_back(*pi);
+				tks.push_back(K);
+				tks.push_back(pi);
 				KalmanVertexFitter kalman(true);
 				TransientVertex v = kalman.vertex(tks);
 				if(!v.isValid() || !v.hasRefittedTracks()) continue;
 				double vtxProb =TMath::Prob( (Double_t) v.totalChiSquared(), (Int_t) v.degreesOfFreedom());
-				TransientTrack K_f = v.refittedTrack(*K);
-				TransientTrack pi_f = v.refittedTrack(*pi);      
+				TransientTrack K_f = v.refittedTrack(K);
+				TransientTrack pi_f = v.refittedTrack(pi);      
 
 				//D0 from D* Siginificance
 				VertexDistanceXY vD0fromDSdXY ;
@@ -385,7 +374,7 @@ void DstarD0TTree::RecDstar(const edm::Event& iEvent, const edm::EventSetup& iSe
 				double dsmass = dS_p4.M();
 				if( (dsmass - d0mass) > 0.16) continue;
 				DsCandidates++; //Number of D* candidates
-
+				
 				D0_VtxProb.push_back(vtxProb);
 				D0mass.push_back(d0_p4.M());
 				Dsmass.push_back(dS_p4.M());
@@ -411,12 +400,12 @@ void DstarD0TTree::RecDstar(const edm::Event& iEvent, const edm::EventSetup& iSe
 				Trkpidz.push_back(pi_f.track().dz(RecVtx.position()));
 				TrkSdz.push_back(trkS.track().dz(RecVtx.position()));
 
-				TrkKnhits.push_back(K->track().numberOfValidHits());
-				Trkpinhits.push_back(pi->track().numberOfValidHits());
+				TrkKnhits.push_back(K.track().numberOfValidHits());
+				Trkpinhits.push_back(pi.track().numberOfValidHits());
 				TrkSnhits.push_back(trkS.track().numberOfValidHits());
 
-				TrkKchi2.push_back(K->track().normalizedChi2());
-				Trkpichi2.push_back(pi->track().normalizedChi2());
+				TrkKchi2.push_back(K.track().normalizedChi2());
+				Trkpichi2.push_back(pi.track().normalizedChi2());
 				TrkSchi2.push_back(trkS.track().normalizedChi2());
 
 				DSDeltaR.push_back(deltaR(d0_p4.eta(),d0_p4.phi(),trkS.track().eta(),trkS.track().phi()));
@@ -438,11 +427,10 @@ void DstarD0TTree::RecDstar(const edm::Event& iEvent, const edm::EventSetup& iSe
 				D0fromDSsXY_vec.push_back(D0fromDSsXY);     
                                
 				NKpiCand++;  
-						
+									
 				if(NKpiCand>999) break;
 			}
 			if(NKpiCand>999) break;
-           //}else {break;}	
 	 } 
 	if(NKpiCand>999) break;
 	}
@@ -845,7 +833,7 @@ double DstarD0TTree::FindAngle(const reco::Vertex& pv , const TransientVertex& s
 //***********************************************************************************
 void DstarD0TTree::initialize(){
 
-	dScandsKpi.clear(); //goodTracks.clear(); 
+	dScandsKpi.clear(); goodTracks.clear(); 
 	goodTracksD0.clear(); slowPiTracks.clear();
 	NKpiCand=0; D0Candidates=0; DsCandidates=0; FlagMC=0; NdsKpiMC=0; 
 	PVx = PVy = PVz = PVerrx = PVerry = PVerrz = -999.;
@@ -914,7 +902,9 @@ void DstarD0TTree::initialize(){
 
 //***********************************************************************************
 void DstarD0TTree::beginJob(){
-
+        
+         //cout << "DsCandidates: " << DsCandidates << " NKpiCand: " << NKpiCand << endl;
+ 
 	data->Branch("D0Candidates",&D0Candidates,"D0Candidates/I");
 	data->Branch("DsCandidates",&DsCandidates,"DsCandidates/I");
 	data->Branch("NdsKpiMC",&NdsKpiMC,"NdsKpiMC/I");
@@ -937,8 +927,6 @@ void DstarD0TTree::beginJob(){
 
 	data->Branch("procId",&procId,"procId/I");
 
-	data->Branch("nHFPlus",&nHFPlus,"nHFPlus/I");
-	data->Branch("nHFMinus",&nHFMinus,"nHFMinus/I");
 
 	data->Branch("HLTPath_",&HLTPath_,"HLTPath_/I");
 
