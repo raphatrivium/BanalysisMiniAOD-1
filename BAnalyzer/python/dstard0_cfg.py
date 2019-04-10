@@ -35,6 +35,8 @@ process.analysis = cms.EDAnalyzer('DstarD0TTree',
     # Analysis
     doMC=cms.bool(True),
     doRec=cms.bool(True),
+    bits = cms.InputTag("TriggerResults","","HLT_Mu9_IP6_part0_v1"),
+    prescales = cms.InputTag("patTrigger"),
     tracks = cms.InputTag('packedPFCandidates'),#Minia AOD
     recVtxs = cms.InputTag('offlineSlimmedPrimaryVertices'), #Mini AOD
     genParticles = cms.InputTag('genParticles'),

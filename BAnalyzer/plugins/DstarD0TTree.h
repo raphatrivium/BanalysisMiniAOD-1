@@ -32,6 +32,8 @@
 #include "DataFormats/Math/interface/LorentzVector.h"
 #include "DataFormats/Math/interface/Vector.h"
 
+#include "DataFormats/PatCandidates/interface/PackedTriggerPrescales.h"
+#include "DataFormats/PatCandidates/interface/TriggerObjectStandAlone.h"
 #include "DataFormats/Common/interface/TriggerResults.h"
 #include "FWCore/Common/interface/TriggerNames.h"
 #include <TString.h>
@@ -101,6 +103,8 @@ class DstarD0TTree : public edm::EDAnalyzer {
 		double FindAngle(const reco::Vertex& , const TransientVertex& , const math::XYZTLorentzVector& ) ;
 		//double FindAngleMCpromptD0(const GenParticle&);
 
+		//Triggers
+
 	private:
 
 		virtual void beginJob() ;
@@ -111,6 +115,8 @@ class DstarD0TTree : public edm::EDAnalyzer {
 		void assignStableDaughters(const reco::Candidate* p, std::vector<int> & pids);
 		void TriggerInfo(const edm::Event&, const edm::EventSetup&);
 		void initialize();
+
+
 
 		// ----------member data ---------------------------
 
@@ -125,6 +131,13 @@ class DstarD0TTree : public edm::EDAnalyzer {
 		std::vector<reco::TransientTrack> tksD0;
 
 		TTree *data;
+
+
+		//Triggers
+		edm::EDGetTokenT<edm::TriggerResults> triggerBits_;
+		edm::EDGetTokenT<std::vector<pat::TriggerObjectStandAlone> > triggerObjects_;
+		edm::EDGetTokenT <pat::PackedTriggerPrescales> triggerPrescales_;
+
 
 		edm::EDGetTokenT<edm::View<pat::PackedCandidate>> trkToken_; //MiniAOD
 		edm::EDGetTokenT<reco::VertexCollection> vtxToken_;
