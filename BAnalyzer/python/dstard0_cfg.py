@@ -30,59 +30,28 @@ process.source = cms.Source("PoolSource",
 
 
 
-#readFiles = cms.untracked.vstring()
-#secFiles = cms.untracked.vstring() 
-#process.source = cms.Source ("PoolSource", fileNames = cms.untracked.vstring('root://cms-xrd-global.cern.ch//store/mc/RunIIFall15DR76/DStarToD0Pi_D0KPi_DStarFilter_TuneCUEP8M1_13TeV-pythia8-evtgen/AODSIM/PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/00000/001496DA-0FD4-E511-9DA9-02163E00EB62.root'))
-
-#)
-#)
-
-
-process.load('L1TriggerConfig.L1GtConfigProducers.L1GtTriggerMaskAlgoTrigConfig_cff')
-process.load('L1TriggerConfig.L1GtConfigProducers.L1GtTriggerMaskTechTrigConfig_cff')
-process.load('HLTrigger/HLTfilters/hltLevel1GTSeed_cfi')
-
-process.L1T1coll=process.hltLevel1GTSeed.clone()
-process.L1T1coll.L1TechTriggerSeeding = cms.bool(True)
-process.L1T1coll.L1SeedsLogicalExpression = cms.string('NOT (36 OR 37 OR 38 OR 39)')
-
-
-process.trigger = cms.EDFilter("HLTHighLevel",
-TriggerResultsTag = cms.InputTag("TriggerResults","","HLT"),
-  HLTPaths = cms.vstring('HLT_MinBias'), # provide list of HLT paths (or patterns) you want
-  eventSetupPathsKey = cms.string(''),
-  andOr              = cms.bool(True),
-  throw              = cms.bool(False),
-#  saveTags           = cms.bool(False)
-
-)
-
-
 
 process.analysis = cms.EDAnalyzer('DstarD0TTree',
     # Analysis
     doMC=cms.bool(True),
     doRec=cms.bool(True),
-    #tracks = cms.InputTag('generalTracks'),#AOD
+    bits = cms.InputTag("TriggerResults","","HLT"),
+    prescales = cms.InputTag("patTrigger"),
+    PathName = cms.untracked.string("HLT_Mu9_IP6_part0_v1"),
     tracks = cms.InputTag('packedPFCandidates'),#Minia AOD
-    #recVtxs = cms.InputTag('offlinePrimaryVertices'), #AOD
     recVtxs = cms.InputTag('offlineSlimmedPrimaryVertices'), #Mini AOD
-    #genParticles = cms.InputTag('genParticleCollection'),
-	genParticles = cms.InputTag('genParticles'),
+    genParticles = cms.InputTag('genParticles'),
     ParticleFlowTag = cms.InputTag("particleFlow"),
     # Options
     comEnergy = cms.double(13000.),
-#    HLTPath = cms.string("HLT_L1_BscMinBiasOR_BptxPlusORMinus"), 
-    HLTPath = cms.string("HLT_MinBias"),  
     TTBIt = cms.int32(34),
+    debug = cms.untracked.bool(False),
     SaveROOTTree = cms.untracked.bool(True)
 
 )
 
 process.TFileService = cms.Service("TFileService",
-    fileName = cms.string('D0DstarMCAnalysis.root')
+    fileName = cms.string('D0DstarData.root')
 )
-#---------------------
-#process.p = cms.Path(process.L1T1coll+process.trigger+process.primaryVertexFilter+process.noscraping+process.analysis)
 
 process.p = cms.Path(process.analysis)

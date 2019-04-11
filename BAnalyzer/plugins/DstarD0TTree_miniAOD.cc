@@ -78,10 +78,7 @@
 #include "DataFormats/ParticleFlowCandidate/interface/PFCandidateFwd.h"
 #include "SimDataFormats/GeneratorProducts/interface/HepMCProduct.h"
 #include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
-//#include "DsD0/DstarD0/interface/EventData.h"
-//#include "/afs/cern.ch/user/r/ragomesd/TrackingShortExercize/CMSSW_10_2_7/src/MyDirectory/PrintOutTracks/plugins/DstarD0TTree.h"
 #include "DstarD0TTree.h"
-//#include "DStarD0/DStarD0Analysis/plugins/CastorRecoParaMsRcd.h"
 #include "DataFormats/Common/interface/TriggerResults.h"
 #include "DataFormats/L1GlobalTrigger/interface/L1GlobalTriggerReadoutSetupFwd.h"
 #include "DataFormats/L1GlobalTrigger/interface/L1GlobalTriggerReadoutSetup.h"
@@ -112,19 +109,19 @@ using namespace edm;
 DstarD0TTree::DstarD0TTree(const edm::ParameterSet& iConfig):
 	doMC(iConfig.getParameter<bool>("doMC")),
 	doRec(iConfig.getParameter<bool>("doRec")),
+        debug(iConfig.getUntrackedParameter<bool>("debug",false)),
+        triggerName_(iConfig.getUntrackedParameter<std::string>("PathName","HLT_Mu9_IP6_part0_v1")),        
+ //Triggers
+        triggerBits_(consumes<edm::TriggerResults>(iConfig.getParameter<edm::InputTag>("bits"))),
+        //triggerObjects_(consumes<std::vector<pat::TriggerObjectStandAlone> >(iConfig.getParameter<edm::InputTag>("objects"))),
+        triggerPrescales_(consumes<pat::PackedTriggerPrescales>(iConfig.getParameter<edm::InputTag>("prescales"))),
 
-	//trkToken_(consumes<reco::TrackCollection>(iConfig.getParameter<edm::InputTag>("tracks"))), //AOD
-	//trkToken_(consumes<pat::PackedCandidate>(iConfig.getParameter<edm::InputTag>("tracks"))), //MiniAOD
 	trkToken_(consumes<edm::View<pat::PackedCandidate>>(iConfig.getParameter<edm::InputTag>("tracks"))), //MiniAOD
 	vtxToken_(consumes<reco::VertexCollection>(iConfig.getParameter<edm::InputTag>("recVtxs"))),
-	//genParticlesToken_(consumes<edm::View<reco::GenParticleCollection> >(iConfig.getParameter<edm::InputTag>("genparticles"))),
-	//genParticlesTokenDstar_(consumes<GenParticleCollection>(iConfig.getParameter<edm::InputTag>("genParticles"))),
-	//genParticlesTokenD0_(consumes<GenParticleCollection>(iConfig.getParameter<edm::InputTag>("genParticles"))),
-
-
-	comEnergy_(iConfig.getParameter<double>("comEnergy")),
-	energyScaleHCAL_(-1.)
-{
+	comEnergy_(iConfig.getParameter<double>("comEnergy"))
+{     
+        counter = 0;
+        countInTriggered = 0;
 	Ebeam_ = comEnergy_/2.;
 	edm::Service<TFileService> fs;
 	data = fs->make<TTree>("data","data");
@@ -154,7 +151,7 @@ void DstarD0TTree::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	using namespace std;
 	using namespace reco;
 	pi_mass=0.13957018; k_mass=0.493677;
-
+        counter++; 
 	//To clear and initialize variables
 	initialize();
 
@@ -167,6 +164,16 @@ void DstarD0TTree::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	iEvent.getByLabel("lumiWeight",lumiWeight);
 
 	lumiWeight_=lumi;
+	
+	//Triggers
+	Handle<edm::TriggerResults> triggerBits;
+	iEvent.getByToken(triggerBits_, triggerBits);
+
+	//Handle<std::vector<pat::TriggerObjectStandAlone> > triggerObjects;
+	//iEvent.getByToken(triggerObjects_, triggerObjects);
+
+	Handle<pat::PackedTriggerPrescales> triggerPrescales;
+	iEvent.getByToken(triggerPrescales_, triggerPrescales);
 
 	//Primary Vtx	  
 	edm::Handle<VertexCollection> recVtxs; //access that VertexCollection
@@ -195,89 +202,77 @@ void DstarD0TTree::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	PVerry=RecVtx.yError();
 	PVerrz=RecVtx.zError();
 
-	// Getting tracks from vert(ex)ices
-	// AOD
-	//	edm::Handle<TrackCollection> tracks; //access that TrackCollection
-	//	iEvent.getByToken(trkToken_,tracks);
 
 	// Getting tracks from vert(ex)ices
 	// MiniAOD
 	edm::Handle< View < pat::PackedCandidate >> tracks; //access that PackedCandidate
 	iEvent.getByToken(trkToken_,tracks);
 
-	//AOD
-	//edm::ESHandle<TransientTrackBuilder> theB;
-	//iSetup.get<TransientTrackRecord>().get("TransientTrackBuilder",theB);
-	//t_tks = (*theB).build(tracks);
-
 	//miniAOD
 	edm::ESHandle<TransientTrackBuilder> theB; 
 	iSetup.get<TransientTrackRecord>().get("TransientTrackBuilder",theB);
 
+            //// Only events in which the path actually fired had stored the filter results and products:	  
+             bool triggerFired = TriggerInfo(iEvent,triggerBits,triggerPrescales,triggerName_);
+                  if(triggerFired) countInTriggered++;
+
+
 	//Selecting Tracks in MiniAOD
 	for(View<pat::PackedCandidate>::const_iterator iTrack1 = tracks->begin(); iTrack1 != tracks->end(); ++iTrack1 ) 
-	{
+	{       if (triggerFired) {
+                //countInAccepted++; 
 		if(!iTrack1->hasTrackDetails()) continue;
 		if(iTrack1->charge()==0) continue;
 		if(fabs(iTrack1->eta())>2.1) continue; //All the mesons were reconstructed in the pseudorapidity range |eta|<2.1
 		if(!(iTrack1->trackHighPurity())) continue;
-		if(iTrack1->pt()>0.3)
+		if(iTrack1->pt()>0.3) //Transverse Momentum
 		{
+			//SlowPion Candidates Selection
 			if(fabs(iTrack1->pdgId()) == 211)
-			{
-				reco::TransientTrack slowpionTT((*theB).build(iTrack1->pseudoTrack()));
-				if(slowpionTT.track().eta() > 2.1) continue;
-				if(slowpionTT.track().normalizedChi2() > 2.5) continue;
-				if(fabs(slowpionTT.track().dxy(RecVtx.position()))<0.1) continue;
-
-				//Fill Vector
-				slowPiTracks.push_back(&(slowpionTT));	
+			{   //|dxy| < 0.1 cm, |dz| < 1 cm; χ2 < 2.5, Nhits > 5; pt > 0.15 GeV/c. 
+				if(iTrack1->pseudoTrack().normalizedChi2() > 3.) continue;
+				//if(iTrack1->pt()<0.15) continue;
+				if(iTrack1->numberOfHits() < 2) continue;
+				if(fabs(iTrack1->dxy())>3.) continue;
+				if(fabs(iTrack1->dz())>3.) continue; 
+				reco::TransientTrack slowpionTT = theB->build(iTrack1->pseudoTrack()); 
+				slowPiTracks.push_back(slowpionTT);	//Fill Transient Vector
 			}
 
 		}
 
+		//Kaon and Pion Candidates
 		if((iTrack1->pt()>0.6) && (fabs(iTrack1->pdgId()) == 211))
 		{
-			if(iTrack1->pseudoTrack().hitPattern().numberOfValidHits() < 5) continue;
-			//Fill Vector
-			reco::TransientTrack PionTT((*theB).build(iTrack1->pseudoTrack()));
-			cout << " PionTT "  << PionTT.track().momentum() << endl;
-			goodTracks.push_back(&PionTT); //Pion and kaon candidates Tracks with pt > 0.6 GeV/c
+			if(iTrack1->pseudoTrack().hitPattern().numberOfValidHits() < 2) continue;
+			if(iTrack1->numberOfHits() < 5) continue;
+			if(fabs(iTrack1->dxy())>0.1) continue;
+			if(fabs(iTrack1->dz())>1.) continue;
+			if(iTrack1->pseudoTrack().normalizedChi2() > 2.5) continue;
+			//Pion and kaon candidates Tracks with pt > 0.6 GeV/c
+			
+			reco::TransientTrack  PionTT = theB->build(iTrack1->pseudoTrack());
+			if (debug)cout << " PionTT "  << PionTT.track().momentum() << endl;
+			goodTracks.push_back(PionTT); //Pion and kaon candidates Tracks with pt > 0.6 GeV/c
 
-			//}
-
-			//if(fabs(iTrack1->pdgId()) !=211)
-			//{
-			//reco::TransientTrack KaonTT((*theB).build(iTrack1->pseudoTrack()));
-			//if(KaonTT.track().numberOfValidHits() < 5) continue;
-			//Fill Vector
-			//}
-	}
-
-}
+	    }
+		// SELECTING TRACKS FOR D0 ,  χ2 < 5.0, Nhits > 5; pt > 0.15 GeV/c, p > 1.0 GeV/c, |dz| < 0.5 cm; |dxy| < 0.1 cm	i             
+		if(fabs(iTrack1->eta())<2.5 && iTrack1->pseudoTrack().normalizedChi2() < 5.0 && iTrack1->pseudoTrack().hitPattern().numberOfValidHits() >= 5 && iTrack1->pt() > 0.5 && iTrack1->p() >1.0 && fabs(iTrack1->dz())<0.5 && fabs(iTrack1->dxy())<0.1)
+        {
+			reco::TransientTrack  D0TT = theB->build(iTrack1->pseudoTrack());
+			//goodTracksD0.push_back(D0TT);
+		}
+     }//trigger
+   }//loop packed candidates
 
 
-cout << " goodTracks size " << goodTracks.size() << endl;
+if (debug) cout << " goodTracks size " << goodTracks.size() << endl;
 ntracksDstar = slowPiTracks.size();
 ntracksD0Kpi = goodTracksD0.size();
 
-cout << "Reading good tracks" << endl;
-
-for(size_t i=0;i<goodTracks.size();i++)
-        {
-
-                for(size_t j=i+1;j<goodTracks.size();j++)
-                {
-                        //TransientTrack* trk2 = goodTracks.at(j);
-                        cout <<   goodTracks[i]->track().momentum() <<    goodTracks[j]->track().momentum() << endl;
-
-                   }
-}
 
 
-
-
-//RecDstar(iEvent,iSetup,RecVtx); //Reconstruction of D*
+RecDstar(iEvent,iSetup,RecVtx); //Reconstruction of D*
 // RecD0(iEvent,iSetup,RecVtx);    //Reconstruction of prompt D0
 //FindAngle(RecVtx,v_D0,d0kpi_p4); //Calculates the opening angle
 //GenDstarInfo(iEvent,iSetup); //Stores information from D0 and its products.
@@ -288,6 +283,26 @@ data->Fill();
 
 }
 
+//*********************************************************************************8
+bool DstarD0TTree::TriggerInfo(const edm::Event& iEvent, edm::Handle<edm::TriggerResults> itriggerBits, edm::Handle<pat::PackedTriggerPrescales> itriggerPrescales, TString trigname){
+ const edm::TriggerNames &names = iEvent.triggerNames(*itriggerBits);
+    std::cout << "\n == TRIGGER PATHS FOUND = " << std::endl;
+    for (unsigned int i = 0, n = itriggerBits->size(); i < n; ++i) {
+         TString trigName = names.triggerName(i);
+         if(trigName.Contains(trigname)) { 
+          std::cout << "Trigger " << names.triggerName(i) <<
+                ", prescale " << itriggerPrescales->getPrescaleForIndex(i) <<
+                ": " << (itriggerBits->accept(i) ? "PASS" : "fail (or not run)")
+                << std::endl;
+               return true; 
+             }
+                
+           }
+
+       return false;
+
+}
+
 //***********************************************************************************
 void DstarD0TTree::RecDstar(const edm::Event& iEvent, const edm::EventSetup& iSetup, const reco::Vertex& RecVtx){
 
@@ -295,41 +310,46 @@ void DstarD0TTree::RecDstar(const edm::Event& iEvent, const edm::EventSetup& iSe
 	using namespace reco;
 	using namespace edm;
 
+    //cout << " RecDstar using goodTracks is " << goodTracks.size() << endl;
 	for(size_t i=0;i<goodTracks.size();i++)
 	{  
-		// cout << " RecDstar goodTracks size " << goodTracks.size() << endl;
-
-		TransientTrack* trk1 = goodTracks.at(i);
+		TransientTrack trk1 =  goodTracks[i];
 
 		for(size_t j=i+1;j<goodTracks.size();j++)
 		{			    
-			TransientTrack* trk2 = goodTracks.at(j);
-//			cout <<   goodTracks[i]->track().momentum() <<    goodTracks[j]->track().momentum() << endl;
+			TransientTrack trk2 = goodTracks[j];
+			//cout << goodTracks[i].track().momentum() << goodTracks[j].track().momentum() << endl;
 
-			// cout << " trk1->track().momentum() " << i << trk1->track().momentum() << " trk2->track().momentum() "<< j << trk2->track().momentum() <<endl;
-			if(trk1->charge() == trk2->charge()) continue;
-			cout<< "OP Charge test" <<endl;
+			if(trk1.charge() == trk2.charge()) continue;
+			//cout<< "OP Charge for two good tracks(px,py,pz)" <<endl;
+            //cout <<   trk1.track().momentum() <<    trk2.track().momentum() << endl;
 
 			//D0 momentum Reconstruction
-			math::XYZVector D0fromDstar_p = trk1->track().momentum() + trk2->track().momentum();
+			math::XYZVector D0fromDstar_p = trk1.track().momentum() + trk2.track().momentum();
+			
+			if(sqrt(D0fromDstar_p.perp2()) < 3.) continue; //???Confirm that selection
 
-			if(sqrt(D0fromDstar_p.perp2()) < 3.) continue; //perp2->transverse component squared
+			//cout << "sqrt(D0fromDstar_p.perp2())"<< sqrt(D0fromDstar_p.perp2()) <<endl;    
 
 			for(size_t k=0;k<slowPiTracks.size();k++)
 			{
-				TransientTrack* trkS = slowPiTracks.at(k);
+				TransientTrack trkS = slowPiTracks[k];
 
-				if(*trkS == *trk1 || *trkS == *trk2) continue;
+				//cout << "Slow Pions Tracks(px,py,pz): "  << trkS.track().momentum() << endl;                
+
+				if(trkS == trk1 || trkS == trk2) continue;
 
 				//D* momentum Reconstruction
-				math::XYZVector DS_p = D0fromDstar_p + trkS->track().momentum();
+				math::XYZVector DS_p = D0fromDstar_p + trkS.track().momentum();
 				if(sqrt(DS_p.perp2())<4.) continue;
 
-				TransientTrack *K=0,*pi=0;
-
+                // cout << "sqrt(DS_p.perp2()): "<< sqrt(DS_p.perp2()) <<endl;
+				TransientTrack K;
+				TransientTrack pi;
+                                
 				//Right Combination Charges
-				if(trk1->charge() == trkS->charge())
-				{
+				if(trk1.charge() == trkS.charge())
+				{ //  cout << "Right Combination Charges" << endl;
 					K = trk2;
 					pi = trk1;
 				}
@@ -338,41 +358,30 @@ void DstarD0TTree::RecDstar(const edm::Event& iEvent, const edm::EventSetup& iSe
 					K = trk1;
 					pi = trk2;
 				}		
-
-				//Combinações erradas dcarga - background
-				/*
-				   if(trk1->charge() == trkS->charge()){
-				   pi = trk2;
-				   K = trk1;
-				   }
-				   else{
-				   pi = trk1;
-				   K = trk2;
-				   }
-				   */
-
+                               
 				//D0 4-momentum Reconstruction
-				math::XYZTLorentzVector ip4_K(K->track().px(),K->track().py(),K->track().pz(),sqrt(pow(K->track().p(),2)+pow(k_mass,2)));
-				math::XYZTLorentzVector ip4_pi(pi->track().px(),pi->track().py(),pi->track().pz(),sqrt(pow(pi->track().p(),2)+pow(pi_mass,2)));        
+				math::XYZTLorentzVector ip4_K(K.track().px(),K.track().py(),K.track().pz(),sqrt(pow(K.track().p(),2)+pow(k_mass,2)));
+				math::XYZTLorentzVector ip4_pi(pi.track().px(),pi.track().py(),pi.track().pz(),sqrt(pow(pi.track().p(),2)+pow(pi_mass,2)));        
 				math::XYZTLorentzVector ip4_D0 = ip4_K + ip4_pi;
 
 				if( fabs(ip4_D0.M()-1.86484)  > 1.) continue;
 
 				//D* 4-momentum Reconstruction
-				math::XYZTLorentzVector p4_S(trkS->track().px(),trkS->track().py(),trkS->track().pz(),sqrt(pow(trkS->track().p(),2)+pow(pi_mass,2)));
+				math::XYZTLorentzVector p4_S(trkS.track().px(),trkS.track().py(),trkS.track().pz(),sqrt(pow(trkS.track().p(),2)+pow(pi_mass,2)));
 				math::XYZTLorentzVector ip4_DS = ip4_D0 + p4_S;
 				if((ip4_DS.M() - ip4_D0.M()) > 0.3) continue;
-
-				//vertexing
+                                //  cout << "ip4_DS.M() :" << ip4_DS.M() << " ip4_D0.M(): " << ip4_D0.M() << endl;
+                                
+				//KalmanVertexFitter
 				vector<TransientTrack> tks;
-				tks.push_back(*K);
-				tks.push_back(*pi);
+				tks.push_back(K);
+				tks.push_back(pi);
 				KalmanVertexFitter kalman(true);
 				TransientVertex v = kalman.vertex(tks);
 				if(!v.isValid() || !v.hasRefittedTracks()) continue;
 				double vtxProb =TMath::Prob( (Double_t) v.totalChiSquared(), (Int_t) v.degreesOfFreedom());
-				TransientTrack K_f = v.refittedTrack(*K);
-				TransientTrack pi_f = v.refittedTrack(*pi);      
+				TransientTrack K_f = v.refittedTrack(K);
+				TransientTrack pi_f = v.refittedTrack(pi);      
 
 				//D0 from D* Siginificance
 				VertexDistanceXY vD0fromDSdXY ;
@@ -380,6 +389,7 @@ void DstarD0TTree::RecDstar(const edm::Event& iEvent, const edm::EventSetup& iSe
 				double D0fromDSeXY = vD0fromDSdXY.distance(RecVtx,v).error() ;
 				double D0fromDSsXY =  D0fromDSdXY / D0fromDSeXY;
 
+				//D* 4-momentum Reconstruction after KalmanVertexFitter
 				math::XYZTLorentzVector p4_K(K_f.track().px(),K_f.track().py(),K_f.track().pz(),sqrt(pow(K_f.track().p(),2)+pow(k_mass,2)));
 				math::XYZTLorentzVector p4_pi(pi_f.track().px(),pi_f.track().py(),pi_f.track().pz(),sqrt(pow(pi_f.track().p(),2)+pow(pi_mass,2)));
 				math::XYZTLorentzVector d0_p4 = p4_K + p4_pi;
@@ -392,7 +402,7 @@ void DstarD0TTree::RecDstar(const edm::Event& iEvent, const edm::EventSetup& iSe
 				double dsmass = dS_p4.M();
 				if( (dsmass - d0mass) > 0.16) continue;
 				DsCandidates++; //Number of D* candidates
-
+				
 				D0_VtxProb.push_back(vtxProb);
 				D0mass.push_back(d0_p4.M());
 				Dsmass.push_back(dS_p4.M());
@@ -412,45 +422,45 @@ void DstarD0TTree::RecDstar(const edm::Event& iEvent, const edm::EventSetup& iSe
 
 				TrkKdxy.push_back(K_f.track().dxy(RecVtx.position()));
 				Trkpidxy.push_back(pi_f.track().dxy(RecVtx.position()));
-				TrkSdxy.push_back(trkS->track().dxy(RecVtx.position()));
+				TrkSdxy.push_back(trkS.track().dxy(RecVtx.position()));
 
 				TrkKdz.push_back(K_f.track().dz(RecVtx.position()));
 				Trkpidz.push_back(pi_f.track().dz(RecVtx.position()));
-				TrkSdz.push_back(trkS->track().dz(RecVtx.position()));
+				TrkSdz.push_back(trkS.track().dz(RecVtx.position()));
 
-				TrkKnhits.push_back(K->track().numberOfValidHits());
-				Trkpinhits.push_back(pi->track().numberOfValidHits());
-				TrkSnhits.push_back(trkS->track().numberOfValidHits());
+				TrkKnhits.push_back(K.track().numberOfValidHits());
+				Trkpinhits.push_back(pi.track().numberOfValidHits());
+				TrkSnhits.push_back(trkS.track().numberOfValidHits());
 
-				TrkKchi2.push_back(K->track().normalizedChi2());
-				Trkpichi2.push_back(pi->track().normalizedChi2());
-				TrkSchi2.push_back(trkS->track().normalizedChi2());
+				TrkKchi2.push_back(K.track().normalizedChi2());
+				Trkpichi2.push_back(pi.track().normalizedChi2());
+				TrkSchi2.push_back(trkS.track().normalizedChi2());
 
-				DSDeltaR.push_back(deltaR(d0_p4.eta(),d0_p4.phi(),trkS->track().eta(),trkS->track().phi()));
+				DSDeltaR.push_back(deltaR(d0_p4.eta(),d0_p4.phi(),trkS.track().eta(),trkS.track().phi()));
 
 				TrkKpt.push_back(K_f.track().pt());
 				Trkpipt.push_back(pi_f.track().pt());
-				TrkSpt.push_back(trkS->track().pt());
+				TrkSpt.push_back(trkS.track().pt());
 
 				TrkKeta.push_back(K_f.track().eta());
 				Trkpieta.push_back(pi_f.track().eta());
-				TrkSeta.push_back(trkS->track().eta());
+				TrkSeta.push_back(trkS.track().eta());
 
 				TrkKphi.push_back(K_f.track().phi());
 				Trkpiphi.push_back(pi_f.track().phi());
-				TrkSphi.push_back(trkS->track().phi());
+				TrkSphi.push_back(trkS.track().phi());
 
-				TrkScharge.push_back(trkS->charge());
+				TrkScharge.push_back(trkS.charge());
 
 				D0fromDSsXY_vec.push_back(D0fromDSsXY);     
-
+                               
 				NKpiCand++;  
-
+									
 				if(NKpiCand>999) break;
 			}
 			if(NKpiCand>999) break;
-		} 
-		if(NKpiCand>999) break;
+	 } 
+	if(NKpiCand>999) break;
 	}
 }//End RecDstar
 
@@ -851,7 +861,7 @@ double DstarD0TTree::FindAngle(const reco::Vertex& pv , const TransientVertex& s
 //***********************************************************************************
 void DstarD0TTree::initialize(){
 
-	dScandsKpi.clear(); //goodTracks.clear(); 
+	dScandsKpi.clear(); goodTracks.clear(); 
 	goodTracksD0.clear(); slowPiTracks.clear();
 	NKpiCand=0; D0Candidates=0; DsCandidates=0; FlagMC=0; NdsKpiMC=0; 
 	PVx = PVy = PVz = PVerrx = PVerry = PVerrz = -999.;
@@ -914,13 +924,24 @@ void DstarD0TTree::initialize(){
 
 	pfsis1Eta_max.clear(); pfsis2Eta_max.clear(); pfsis1Eta_min.clear(); pfsis2Eta_min.clear(); deltaEtapf.clear();
 
-	triggers.clear();
+	//triggers.clear();
 
+}
+//++++++++++++++++++
+void DstarD0TTree::endJob(){
+
+    cout <<"######################################################################"<<endl;
+    cout << "Number of Events: " << eventNumber << " Run Number: " << runNumber << endl;
+    cout << "Total # events: " << counter << endl;
+    cout << "Total # events triggered by " << triggerName_ << " : " << countInTriggered << endl;
+    
 }
 
 //***********************************************************************************
 void DstarD0TTree::beginJob(){
-
+        
+    //cout << "DsCandidates: " << DsCandidates << " NKpiCand: " << NKpiCand << endl;
+ 
 	data->Branch("D0Candidates",&D0Candidates,"D0Candidates/I");
 	data->Branch("DsCandidates",&DsCandidates,"DsCandidates/I");
 	data->Branch("NdsKpiMC",&NdsKpiMC,"NdsKpiMC/I");
@@ -940,16 +961,56 @@ void DstarD0TTree::beginJob(){
 	data->Branch("ntracksD0Kpi",&ntracksD0Kpi,"ntracksD0Kpi/I");
 	data->Branch("ntracksDstar",&ntracksDstar,"ntracksDstar/I");
 
-
 	data->Branch("procId",&procId,"procId/I");
 
-	data->Branch("nHFPlus",&nHFPlus,"nHFPlus/I");
-	data->Branch("nHFMinus",&nHFMinus,"nHFMinus/I");
-
-	data->Branch("HLTPath_",&HLTPath_,"HLTPath_/I");
-
+//	data->Branch("HLTPath_",&HLTPath_,"HLTPath_/I");
 
 	//======================================================
+	// D* -> D0 + pi_slow  Variables
+	//======================================================
+
+	data->Branch("D0mass",&D0mass);
+	data->Branch("Dsmass",&Dsmass);
+	data->Branch("D0_VtxProb",&D0_VtxProb);
+	data->Branch("D0_VtxPosx",&D0_VtxPosx);
+	data->Branch("D0_VtxPosy",&D0_VtxPosy);
+	data->Branch("D0_VtxPosz",&D0_VtxPosz);
+	data->Branch("D0_Vtxerrx",&D0_Vtxerrx);
+	data->Branch("D0_Vtxerry",&D0_Vtxerry);
+	data->Branch("D0_Vtxerrz",&D0_Vtxerrz);
+	data->Branch("D0eta",&D0eta);
+	data->Branch("D0phi",&D0phi);
+	data->Branch("Dseta",&Dseta);
+	data->Branch("Dsphi",&Dsphi);
+	data->Branch("TrkKpt",&TrkKpt);
+	data->Branch("Trkpipt",&Trkpipt);
+	data->Branch("TrkSpt",&TrkSpt);
+	data->Branch("D0pt",&D0pt);
+	data->Branch("Dspt",&Dspt);
+	data->Branch("DSDeltaR",&DSDeltaR);
+	data->Branch("TrkKnhits",&TrkKnhits);
+	data->Branch("Trkpinhits",&Trkpinhits);
+	data->Branch("TrkSnhits",&TrkSnhits);
+	data->Branch("TrkKchi2",&TrkKchi2);
+	data->Branch("Trkpichi2",&Trkpichi2);
+	data->Branch("TrkSchi2",&TrkSchi2);
+	data->Branch("TrkKdxy",&TrkKdxy);
+	data->Branch("Trkpidxy",&Trkpidxy);
+	data->Branch("TrkSdxy",&TrkSdxy);
+	data->Branch("TrkKdz",&TrkKdz);
+	data->Branch("Trkpidz",&Trkpidz);
+	data->Branch("TrkSdz",&TrkSdz); 
+	data->Branch("TrkKeta",&TrkKeta);      
+	data->Branch("Trkpieta",&Trkpieta);
+	data->Branch("TrkSeta",&TrkSeta);
+	data->Branch("TrkKphi",&TrkKphi);
+	data->Branch("Trkpiphi",&Trkpiphi);
+	data->Branch("TrkSphi",&TrkSphi);
+	data->Branch("TrkScharge",&TrkScharge);
+	data->Branch("D0fromDSsXY",&D0fromDSsXY_vec);
+	//data->Branch("triggers",&triggers);
+
+//======================================================
 	// D0 Variables
 	//======================================================
 
@@ -983,50 +1044,9 @@ void DstarD0TTree::beginJob(){
 	data->Branch("D0KpikT",&D0_kT_vec);
 	data->Branch("D0KpiDispAngle",&D0Kpi_DispAngle);*/
 
-	//======================================================
-	// D* -> D0 + pi_slow  Variables
-	//======================================================
-
-	/*data->Branch("D0mass",&D0mass);
-	  data->Branch("Dsmass",&Dsmass);
-	  data->Branch("D0_VtxProb",&D0_VtxProb);
-	  data->Branch("D0_VtxPosx",&D0_VtxPosx);
-	  data->Branch("D0_VtxPosy",&D0_VtxPosy);
-	  data->Branch("D0_VtxPosz",&D0_VtxPosz);
-	  data->Branch("D0_Vtxerrx",&D0_Vtxerrx);
-	  data->Branch("D0_Vtxerry",&D0_Vtxerry);
-	  data->Branch("D0_Vtxerrz",&D0_Vtxerrz);*/
-	data->Branch("D0eta",&D0eta);
-	data->Branch("D0phi",&D0phi);
-	data->Branch("Dseta",&Dseta);
-	data->Branch("Dsphi",&Dsphi);
-	data->Branch("TrkKpt",&TrkKpt);
-	data->Branch("Trkpipt",&Trkpipt);
-	data->Branch("TrkSpt",&TrkSpt);
-	data->Branch("D0pt",&D0pt);
-	data->Branch("Dspt",&Dspt);
-	//data->Branch("DSDeltaR",&DSDeltaR);
-	data->Branch("TrkKnhits",&TrkKnhits);
-	data->Branch("Trkpinhits",&Trkpinhits);
-	data->Branch("TrkSnhits",&TrkSnhits);
-	//data->Branch("TrkKchi2",&TrkKchi2);*/
-	//data->Branch("Trkpichi2",&Trkpichi2);
-	//data->Branch("TrkSchi2",&TrkSchi2);
-	/*data->Branch("TrkKdxy",&TrkKdxy);
-	  data->Branch("Trkpidxy",&Trkpidxy);
-	  data->Branch("TrkSdxy",&TrkSdxy);
-	  data->Branch("TrkKdz",&TrkKdz);
-	  data->Branch("Trkpidz",&Trkpidz);
-	  data->Branch("TrkSdz",&TrkSdz);*/ 
-	/*data->Branch("TrkKeta",&TrkKeta);      
-	  data->Branch("Trkpieta",&Trkpieta);
-	  data->Branch("TrkSeta",&TrkSeta);
-	  data->Branch("TrkKphi",&TrkKphi);
-	  data->Branch("Trkpiphi",&Trkpiphi);
-	  data->Branch("TrkSphi",&TrkSphi);
-	  data->Branch("TrkScharge",&TrkScharge);
-	  data->Branch("D0fromDSsXY",&D0fromDSsXY_vec);
-	  data->Branch("triggers",&triggers);*/
+//======================================================
+	// MC Variables
+//======================================================
 
 	/*
 	   data->Branch("MCDseta",&MCDseta);
