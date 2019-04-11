@@ -90,6 +90,8 @@
 #include "DataFormats/PatCandidates/interface/Muon.h"
 #include "DataFormats/PatCandidates/interface/PackedCandidate.h"
 
+#include <string>
+
 //
 // class declaration
 //
@@ -103,17 +105,17 @@ class DstarD0TTree : public edm::EDAnalyzer {
 		double FindAngle(const reco::Vertex& , const TransientVertex& , const math::XYZTLorentzVector& ) ;
 		//double FindAngleMCpromptD0(const GenParticle&);
 
-		//Triggers
 
 	private:
 
 		virtual void beginJob() ;
+                virtual void endJob() ;
 		virtual void analyze(const edm::Event&, const edm::EventSetup&);
 		void GenDstarInfo(const edm::Event& iEvent,const edm::EventSetup&);
 		void GenD0Info(const edm::Event& iEvent,const edm::EventSetup&);
 
 		void assignStableDaughters(const reco::Candidate* p, std::vector<int> & pids);
-		void TriggerInfo(const edm::Event&, const edm::EventSetup&);
+		bool TriggerInfo(const edm::Event&, edm::Handle<edm::TriggerResults>, edm::Handle<pat::PackedTriggerPrescales> ,TString trigname);
 		void initialize();
 
 
@@ -121,15 +123,15 @@ class DstarD0TTree : public edm::EDAnalyzer {
 		// ----------member data ---------------------------
 
 
-		bool doMC, doRec;
+		bool doMC, doRec,debug;
 		double pi_mass, k_mass;
+                std::string triggerName_;
 		std::vector<int> dScandsKpi;
 		std::vector<reco::TransientTrack>  goodTracks;
 		std::vector<reco::TransientTrack*>  goodTracksD0;
 		std::vector<reco::TransientTrack> slowPiTracks;
 		std::vector<reco::TransientTrack> t_tks;
 		std::vector<reco::TransientTrack> tksD0;
-
 		TTree *data;
 
 
@@ -159,12 +161,6 @@ class DstarD0TTree : public edm::EDAnalyzer {
 
 		double Ebeam_;
 		double comEnergy_;
-
-
-		std::string hltPathName_;	
-		std::vector<std::string> triggers;
-
-		//std::string hltPathName_; 
 		int TTBit_8,TTBit_9,TTBit_10,TTBit_32,TTBit_33,TTBit_34; 
 
 		bool signalpf;      
@@ -173,8 +169,10 @@ class DstarD0TTree : public edm::EDAnalyzer {
 		int nHFPlus;
 		int nHFMinus;
 
-		int runNumber,eventNumber,lumi;
+		int counter,runNumber,eventNumber,lumi;
 
+                int countInTriggered;
+ 
 		int ND0KpiCand, NKpiCand,D0Candidates,DsCandidates,NdsKpiMC,FlagMC,FlagRec,n_pVertex,ntracksD0Kpi,ntracksDstar,HLTPath_,TTBit_;   
 
 		double PVx,PVy,PVz,PVerrx,PVerry,PVerrz,lumiWeight_;  

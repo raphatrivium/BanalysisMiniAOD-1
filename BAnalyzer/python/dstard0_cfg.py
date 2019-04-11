@@ -35,16 +35,17 @@ process.analysis = cms.EDAnalyzer('DstarD0TTree',
     # Analysis
     doMC=cms.bool(True),
     doRec=cms.bool(True),
-    bits = cms.InputTag("TriggerResults","","HLT_Mu9_IP6_part0_v1"),
+    bits = cms.InputTag("TriggerResults","","HLT"),
     prescales = cms.InputTag("patTrigger"),
+    PathName = cms.untracked.string("HLT_Mu9_IP6_part0_v1"),
     tracks = cms.InputTag('packedPFCandidates'),#Minia AOD
     recVtxs = cms.InputTag('offlineSlimmedPrimaryVertices'), #Mini AOD
     genParticles = cms.InputTag('genParticles'),
     ParticleFlowTag = cms.InputTag("particleFlow"),
     # Options
     comEnergy = cms.double(13000.),
-    HLTPath = cms.string("HLT_MinBias"),  
     TTBIt = cms.int32(34),
+    debug = cms.untracked.bool(False),
     SaveROOTTree = cms.untracked.bool(True)
 
 )

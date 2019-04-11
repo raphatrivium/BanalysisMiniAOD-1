@@ -78,10 +78,7 @@
 #include "DataFormats/ParticleFlowCandidate/interface/PFCandidateFwd.h"
 #include "SimDataFormats/GeneratorProducts/interface/HepMCProduct.h"
 #include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
-//#include "DsD0/DstarD0/interface/EventData.h"
-//#include "/afs/cern.ch/user/r/ragomesd/TrackingShortExercize/CMSSW_10_2_7/src/MyDirectory/PrintOutTracks/plugins/DstarD0TTree.h"
 #include "DstarD0TTree.h"
-//#include "DStarD0/DStarD0Analysis/plugins/CastorRecoParaMsRcd.h"
 #include "DataFormats/Common/interface/TriggerResults.h"
 #include "DataFormats/L1GlobalTrigger/interface/L1GlobalTriggerReadoutSetupFwd.h"
 #include "DataFormats/L1GlobalTrigger/interface/L1GlobalTriggerReadoutSetup.h"
@@ -112,7 +109,8 @@ using namespace edm;
 DstarD0TTree::DstarD0TTree(const edm::ParameterSet& iConfig):
 	doMC(iConfig.getParameter<bool>("doMC")),
 	doRec(iConfig.getParameter<bool>("doRec")),
-
+        debug(iConfig.getUntrackedParameter<bool>("debug",false)),
+        triggerName_(iConfig.getUntrackedParameter<std::string>("PathName","HLT_Mu9_IP6_part0_v1")),        
  //Triggers
         triggerBits_(consumes<edm::TriggerResults>(iConfig.getParameter<edm::InputTag>("bits"))),
         //triggerObjects_(consumes<std::vector<pat::TriggerObjectStandAlone> >(iConfig.getParameter<edm::InputTag>("objects"))),
@@ -121,7 +119,9 @@ DstarD0TTree::DstarD0TTree(const edm::ParameterSet& iConfig):
 	trkToken_(consumes<edm::View<pat::PackedCandidate>>(iConfig.getParameter<edm::InputTag>("tracks"))), //MiniAOD
 	vtxToken_(consumes<reco::VertexCollection>(iConfig.getParameter<edm::InputTag>("recVtxs"))),
 	comEnergy_(iConfig.getParameter<double>("comEnergy"))
-{
+{     
+        counter = 0;
+        countInTriggered = 0;
 	Ebeam_ = comEnergy_/2.;
 	edm::Service<TFileService> fs;
 	data = fs->make<TTree>("data","data");
@@ -151,7 +151,7 @@ void DstarD0TTree::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	using namespace std;
 	using namespace reco;
 	pi_mass=0.13957018; k_mass=0.493677;
-
+        counter++; 
 	//To clear and initialize variables
 	initialize();
 
@@ -212,17 +212,15 @@ void DstarD0TTree::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	edm::ESHandle<TransientTrackBuilder> theB; 
 	iSetup.get<TransientTrackRecord>().get("TransientTrackBuilder",theB);
 
-    const edm::TriggerNames &names = iEvent.triggerNames(*triggerBits);
-    std::cout << "\n == TRIGGER PATHS= " << std::endl;
-    for (unsigned int i = 0, n = triggerBits->size(); i < n; ++i) {
-        std::cout << "Trigger " << names.triggerName(i) <<
-                ", prescale " << triggerPrescales->getPrescaleForIndex(i) <<
-                ": " << (triggerBits->accept(i) ? "PASS" : "fail (or not run)")
-                << std::endl;
+            //// Only events in which the path actually fired had stored the filter results and products:	  
+             bool triggerFired = TriggerInfo(iEvent,triggerBits,triggerPrescales,triggerName_);
+                  if(triggerFired) countInTriggered++;
+
 
 	//Selecting Tracks in MiniAOD
 	for(View<pat::PackedCandidate>::const_iterator iTrack1 = tracks->begin(); iTrack1 != tracks->end(); ++iTrack1 ) 
-	{
+	{       if (triggerFired) {
+                //countInAccepted++; 
 		if(!iTrack1->hasTrackDetails()) continue;
 		if(iTrack1->charge()==0) continue;
 		if(fabs(iTrack1->eta())>2.1) continue; //All the mesons were reconstructed in the pseudorapidity range |eta|<2.1
@@ -254,7 +252,7 @@ void DstarD0TTree::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 			//Pion and kaon candidates Tracks with pt > 0.6 GeV/c
 			
 			reco::TransientTrack  PionTT = theB->build(iTrack1->pseudoTrack());
-			//cout << " PionTT "  << PionTT.track().momentum() << endl;
+			if (debug)cout << " PionTT "  << PionTT.track().momentum() << endl;
 			goodTracks.push_back(PionTT); //Pion and kaon candidates Tracks with pt > 0.6 GeV/c
 
 	    }
@@ -264,26 +262,14 @@ void DstarD0TTree::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 			reco::TransientTrack  D0TT = theB->build(iTrack1->pseudoTrack());
 			//goodTracksD0.push_back(D0TT);
 		}
-
+     }//trigger
    }//loop packed candidates
-} //HLT trigger
 
-//cout << " goodTracks size " << goodTracks.size() << endl;
+
+if (debug) cout << " goodTracks size " << goodTracks.size() << endl;
 ntracksDstar = slowPiTracks.size();
 ntracksD0Kpi = goodTracksD0.size();
 
-/*
-	cout << "Reading good tracks" << endl;
-	for(size_t i=0;i<goodTracks.size();i++)
-	{
-		for(size_t j=i+1;j<goodTracks.size();j++)
-		{
-			//TransientTrack* trk2 = goodTracks.at(j);
-			cout <<   goodTracks[i].track().momentum() <<    goodTracks[j].track().momentum() << endl;
-
-		}
-	}
-*/
 
 
 RecDstar(iEvent,iSetup,RecVtx); //Reconstruction of D*
@@ -294,6 +280,26 @@ RecDstar(iEvent,iSetup,RecVtx); //Reconstruction of D*
 //      FindAngleMCpromptD0(p);
 
 data->Fill();
+
+}
+
+//*********************************************************************************8
+bool DstarD0TTree::TriggerInfo(const edm::Event& iEvent, edm::Handle<edm::TriggerResults> itriggerBits, edm::Handle<pat::PackedTriggerPrescales> itriggerPrescales, TString trigname){
+ const edm::TriggerNames &names = iEvent.triggerNames(*itriggerBits);
+    std::cout << "\n == TRIGGER PATHS FOUND = " << std::endl;
+    for (unsigned int i = 0, n = itriggerBits->size(); i < n; ++i) {
+         TString trigName = names.triggerName(i);
+         if(trigName.Contains(trigname)) { 
+          std::cout << "Trigger " << names.triggerName(i) <<
+                ", prescale " << itriggerPrescales->getPrescaleForIndex(i) <<
+                ": " << (itriggerBits->accept(i) ? "PASS" : "fail (or not run)")
+                << std::endl;
+               return true; 
+             }
+                
+           }
+
+       return false;
 
 }
 
@@ -918,8 +924,17 @@ void DstarD0TTree::initialize(){
 
 	pfsis1Eta_max.clear(); pfsis2Eta_max.clear(); pfsis1Eta_min.clear(); pfsis2Eta_min.clear(); deltaEtapf.clear();
 
-	triggers.clear();
+	//triggers.clear();
 
+}
+//++++++++++++++++++
+void DstarD0TTree::endJob(){
+
+    cout <<"######################################################################"<<endl;
+    cout << "Number of Events: " << eventNumber << " Run Number: " << runNumber << endl;
+    cout << "Total # events: " << counter << endl;
+    cout << "Total # events triggered by " << triggerName_ << " : " << countInTriggered << endl;
+    
 }
 
 //***********************************************************************************
@@ -948,7 +963,7 @@ void DstarD0TTree::beginJob(){
 
 	data->Branch("procId",&procId,"procId/I");
 
-	data->Branch("HLTPath_",&HLTPath_,"HLTPath_/I");
+//	data->Branch("HLTPath_",&HLTPath_,"HLTPath_/I");
 
 	//======================================================
 	// D* -> D0 + pi_slow  Variables
