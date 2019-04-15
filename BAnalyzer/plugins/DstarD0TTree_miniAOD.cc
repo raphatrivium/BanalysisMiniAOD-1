@@ -179,6 +179,12 @@ void DstarD0TTree::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	edm::Handle<VertexCollection> recVtxs; //access that VertexCollection
 	iEvent.getByToken(vtxToken_,recVtxs);
 
+//Only events in which the path actually fired had stored the filter results and products:	  
+bool triggerFired = TriggerInfo(iEvent,triggerBits,triggerPrescales,triggerName_);
+if (triggerFired)
+{
+        countInTriggered++;
+
 	size_t vtx_trk_size = (*recVtxs)[0].tracksSize();
 	int VtxIn=0;
 	for(size_t i = 0; i < recVtxs->size(); ++ i)
@@ -212,14 +218,13 @@ void DstarD0TTree::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	edm::ESHandle<TransientTrackBuilder> theB; 
 	iSetup.get<TransientTrackRecord>().get("TransientTrackBuilder",theB);
 
-            //// Only events in which the path actually fired had stored the filter results and products:	  
-             bool triggerFired = TriggerInfo(iEvent,triggerBits,triggerPrescales,triggerName_);
-                  if(triggerFired) countInTriggered++;
-
+    //Only events in which the path actually fired had stored the filter results and products:	  
+    //bool triggerFired = TriggerInfo(iEvent,triggerBits,triggerPrescales,triggerName_);
+    //if(triggerFired) countInTriggered++;
 
 	//Selecting Tracks in MiniAOD
 	for(View<pat::PackedCandidate>::const_iterator iTrack1 = tracks->begin(); iTrack1 != tracks->end(); ++iTrack1 ) 
-	{       if (triggerFired) {
+	{      // if (triggerFired) {
                 //countInAccepted++; 
 		if(!iTrack1->hasTrackDetails()) continue;
 		if(iTrack1->charge()==0) continue;
@@ -262,9 +267,9 @@ void DstarD0TTree::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 			reco::TransientTrack  D0TT = theB->build(iTrack1->pseudoTrack());
 			//goodTracksD0.push_back(D0TT);
 		}
-     }//trigger
+     //}//trigger
    }//loop packed candidates
-
+}//trigger
 
 if (debug) cout << " goodTracks size " << goodTracks.size() << endl;
 ntracksDstar = slowPiTracks.size();
@@ -1057,7 +1062,6 @@ void DstarD0TTree::beginJob(){
 	   data->Branch("MCDset",&MCDset);
 	   data->Branch("MCDsrapidity",&MCDsrapidity);
 	   data->Branch("MCDsmass",&MCDsmass);
-
 	   data->Branch("MCD0eta",&MCD0eta);
 	   data->Branch("MCD0phi",&MCD0phi);
 	   data->Branch("MCD0pt",&MCD0pt);
@@ -1066,7 +1070,6 @@ void DstarD0TTree::beginJob(){
 	   data->Branch("MCD0et",&MCD0et);
 	   data->Branch("MCD0rapidity",&MCD0rapidity);
 	   data->Branch("MCD0mass",&MCD0mass);
-
 	   data->Branch("MCpromptD0eta",&MCpromptD0eta);
 	   data->Branch("MCpromptD0phi",&MCpromptD0phi);
 	   data->Branch("MCpromptD0pt",&MCpromptD0pt);
@@ -1075,7 +1078,6 @@ void DstarD0TTree::beginJob(){
 	   data->Branch("MCpromptD0et",&MCpromptD0et);
 	   data->Branch("MCpromptD0rapidity",&MCpromptD0rapidity);
 	   data->Branch("MCpromptD0mass",&MCpromptD0mass);
-
 	   data->Branch("MCpromptD0_Keta",&MCpromptD0_Keta);
 	   data->Branch("MCpromptD0_Kphi",&MCpromptD0_Kphi);
 	   data->Branch("MCpromptD0_Kpt",&MCpromptD0_Kpt);
@@ -1084,7 +1086,6 @@ void DstarD0TTree::beginJob(){
 	   data->Branch("MCpromptD0_Ket",&MCpromptD0_Ket);
 	   data->Branch("MCpromptD0_Krapidity",&MCpromptD0_Krapidity);
 	   data->Branch("MCpromptD0_Kmass",&MCpromptD0_Kmass);
-
 	   data->Branch("MCpromptD0_Pieta",&MCpromptD0_Pieta);
 	   data->Branch("MCpromptD0_Piphi",&MCpromptD0_Piphi);
 	   data->Branch("MCpromptD0_Pipt",&MCpromptD0_Pipt);
@@ -1101,6 +1102,3 @@ void DstarD0TTree::beginJob(){
 
 //define this as a plug-in
 DEFINE_FWK_MODULE(DstarD0TTree);
-
-
-
