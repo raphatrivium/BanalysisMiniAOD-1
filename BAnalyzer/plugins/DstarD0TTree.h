@@ -125,10 +125,10 @@ class DstarD0TTree : public edm::EDAnalyzer {
 
 		bool doMC, doRec,debug;
 		double pi_mass, k_mass;
-                std::string triggerName_;
+        std::string triggerName_;
 		std::vector<int> dScandsKpi;
 		std::vector<reco::TransientTrack>  goodTracks;
-		std::vector<reco::TransientTrack*>  goodTracksD0;
+		std::vector<reco::TransientTrack>  goodTracksD0;
 		std::vector<reco::TransientTrack> slowPiTracks;
 		std::vector<reco::TransientTrack> t_tks;
 		std::vector<reco::TransientTrack> tksD0;
@@ -147,11 +147,8 @@ class DstarD0TTree : public edm::EDAnalyzer {
 		edm::EDGetTokenT<reco::GenParticleCollection> genParticlesTokenDstar_;
 		edm::EDGetTokenT<reco::GenParticleCollection> genParticlesTokenD0_;
 
-
 		//edm::EDGetTokenT<reco::GenParticleCollection> genParticlesToken_;
 		//edm::EDGetTokenT<edm::View<reco::GenParticle> > genParticlesToken_;
-
-
 
 		TransientVertex v_D0;
 		math::XYZTLorentzVector d0kpi_p4;
@@ -171,7 +168,7 @@ class DstarD0TTree : public edm::EDAnalyzer {
 
 		int counter,runNumber,eventNumber,lumi;
 
-                int countInTriggered;
+        int countInTriggered;
  
 		int ND0KpiCand, NKpiCand,D0Candidates,DsCandidates,NdsKpiMC,FlagMC,FlagRec,n_pVertex,ntracksD0Kpi,ntracksDstar,HLTPath_,TTBit_;   
 

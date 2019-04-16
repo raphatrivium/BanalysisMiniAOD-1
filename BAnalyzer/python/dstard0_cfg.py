@@ -24,6 +24,7 @@ process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
 #'root://xrootd.unl.edu//store/mc/RunIISpring15DR74/QCD_Pt-15to7000_TuneCUETP8M1_Flat_13TeV_pythia8/GEN-SIM-RECO/AsymptNoPUbx25Reco_MCRUN2_74_V9-v3/00000/04B705C0-5407-E511-AB52-00A0D1EE8A20.root'	
 'root://cmsxrootd.fnal.gov//store/data/Run2018A/ParkingBPH1/MINIAOD/14May2018-v1/30000/129EAF02-B85A-E811-AC4E-0CC47A1DF818.root' #Data mniAOD
+#'file:129EAF02-B85A-E811-AC4E-0CC47A1DF818.root' #Data mniAOD
 	   )
 )
 #===================================================================
