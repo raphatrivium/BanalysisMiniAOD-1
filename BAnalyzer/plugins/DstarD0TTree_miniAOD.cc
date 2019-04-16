@@ -179,11 +179,11 @@ void DstarD0TTree::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	edm::Handle<VertexCollection> recVtxs; //access that VertexCollection
 	iEvent.getByToken(vtxToken_,recVtxs);
 
-//Only events in which the path actually fired had stored the filter results and products:	  
-bool triggerFired = TriggerInfo(iEvent,triggerBits,triggerPrescales,triggerName_);
-if (triggerFired)
-{
-        countInTriggered++;
+	//Only events in which the path actually fired had stored the filter results and products:    
+    bool triggerFired = TriggerInfo(iEvent,triggerBits,triggerPrescales,triggerName_);
+    if(triggerFired) countInTriggered++;
+
+   /* countInTriggered++;
 
 	size_t vtx_trk_size = (*recVtxs)[0].tracksSize();
 	int VtxIn=0;
@@ -199,15 +199,20 @@ if (triggerFired)
 
 	const Vertex& RecVtx = (*recVtxs)[VtxIn];
 
+    //Only events in which the path actually fired had stored the filter results and products:	  
+    bool triggerFired = TriggerInfo(iEvent,triggerBits,triggerPrescales,triggerName_);
+    if (triggerFired)
+    {
+
 	n_pVertex = recVtxs->size();
 
 	PVx = RecVtx.x();
 	PVy = RecVtx.y();
 	PVz = RecVtx.z();
-	PVerrx=RecVtx.xError();
-	PVerry=RecVtx.yError();
-	PVerrz=RecVtx.zError();
-
+	PVerrx= RecVtx.xError();
+	PVerry= RecVtx.yError();
+	PVerrz= RecVtx.zError();
+*/
 
 	// Getting tracks from vert(ex)ices
 	// MiniAOD
@@ -222,29 +227,29 @@ if (triggerFired)
     //bool triggerFired = TriggerInfo(iEvent,triggerBits,triggerPrescales,triggerName_);
     //if(triggerFired) countInTriggered++;
 
-	//Selecting Tracks in MiniAOD
+	//Loop in the trakcs of the PackedCandidate 
 	for(View<pat::PackedCandidate>::const_iterator iTrack1 = tracks->begin(); iTrack1 != tracks->end(); ++iTrack1 ) 
-	{      // if (triggerFired) {
-                //countInAccepted++; 
-		if(!iTrack1->hasTrackDetails()) continue;
-		if(iTrack1->charge()==0) continue;
-		if(fabs(iTrack1->eta())>2.1) continue; //All the mesons were reconstructed in the pseudorapidity range |eta|<2.1
-		if(!(iTrack1->trackHighPurity())) continue;
-		if(iTrack1->pt()>0.3) //Transverse Momentum
-		{
-			//SlowPion Candidates Selection
-			if(fabs(iTrack1->pdgId()) == 211)
-			{   //|dxy| < 0.1 cm, |dz| < 1 cm; χ2 < 2.5, Nhits > 5; pt > 0.15 GeV/c. 
-				if(iTrack1->pseudoTrack().normalizedChi2() > 3.) continue;
-				//if(iTrack1->pt()<0.15) continue;
-				if(iTrack1->numberOfHits() < 2) continue;
-				if(fabs(iTrack1->dxy())>3.) continue;
-				if(fabs(iTrack1->dz())>3.) continue; 
-				reco::TransientTrack slowpionTT = theB->build(iTrack1->pseudoTrack()); 
-				slowPiTracks.push_back(slowpionTT);	//Fill Transient Vector
-			}
-
-		}
+	{       
+        if (triggerFired) 
+        { 
+            if(!iTrack1->hasTrackDetails()) continue;
+            if(iTrack1->charge()==0) continue;
+            if(fabs(iTrack1->eta())>2.1) continue; //All the mesons were reconstructed in the pseudorapidity range |eta|<2.1
+            if(!(iTrack1->trackHighPurity())) continue;
+            if(iTrack1->pt()>0.3) //Transverse Momentum
+            {
+                //SlowPion Candidates Selection
+                if(fabs(iTrack1->pdgId()) == 211)
+                {   //|dxy| < 0.1 cm, |dz| < 1 cm; χ2 < 2.5, Nhits > 5; pt > 0.15 GeV/c. 
+                    if(iTrack1->pseudoTrack().normalizedChi2() > 3.) continue;
+                    //if(iTrack1->pt()<0.15) continue;
+                    if(iTrack1->numberOfHits() < 2) continue;
+                    if(fabs(iTrack1->dxy())>3.) continue;
+                    if(fabs(iTrack1->dz())>3.) continue; 
+                    reco::TransientTrack slowpionTT = theB->build(iTrack1->pseudoTrack()); 
+                    slowPiTracks.push_back(slowpionTT);	//Fill Transient Vector
+			    }
+		    }
 
 		//Kaon and Pion Candidates
 		if((iTrack1->pt()>0.6) && (fabs(iTrack1->pdgId()) == 211))
@@ -267,14 +272,38 @@ if (triggerFired)
 			reco::TransientTrack  D0TT = theB->build(iTrack1->pseudoTrack());
 			//goodTracksD0.push_back(D0TT);
 		}
-     //}//trigger
+     }//trigger
    }//loop packed candidates
-}//trigger
+//}//trigger
 
-if (debug) cout << " goodTracks size " << goodTracks.size() << endl;
-ntracksDstar = slowPiTracks.size();
-ntracksD0Kpi = goodTracksD0.size();
+    if (debug) cout << " goodTracks size " << goodTracks.size() << endl;
+    ntracksDstar = slowPiTracks.size();
+    ntracksD0Kpi = goodTracksD0.size();
 
+    if(triggerFired)
+    {
+        size_t vtx_trk_size = (*recVtxs)[0].tracksSize();
+	    int VtxIn=0;
+	    for(size_t i = 0; i < recVtxs->size(); ++ i)
+	    {
+	        const Vertex &vtx = (*recVtxs)[i];
+	        if(vtx.tracksSize()>vtx_trk_size)
+	        {
+                VtxIn = i;
+                vtx_trk_size = vtx.tracksSize();
+	        }
+	    }
+
+    const Vertex& RecVtx = (*recVtxs)[VtxIn];
+
+	n_pVertex = recVtxs->size();
+
+	PVx = RecVtx.x();
+	PVy = RecVtx.y();
+	PVz = RecVtx.z();
+	PVerrx=RecVtx.xError();
+	PVerry=RecVtx.yError();
+    PVerrz=RecVtx.zError();
 
 
 RecDstar(iEvent,iSetup,RecVtx); //Reconstruction of D*
@@ -285,10 +314,10 @@ RecDstar(iEvent,iSetup,RecVtx); //Reconstruction of D*
 //      FindAngleMCpromptD0(p);
 
 data->Fill();
-
+    }
 }
 
-//*********************************************************************************8
+//*********************************************************************************
 bool DstarD0TTree::TriggerInfo(const edm::Event& iEvent, edm::Handle<edm::TriggerResults> itriggerBits, edm::Handle<pat::PackedTriggerPrescales> itriggerPrescales, TString trigname){
  const edm::TriggerNames &names = iEvent.triggerNames(*itriggerBits);
     std::cout << "\n == TRIGGER PATHS FOUND = " << std::endl;
@@ -1015,7 +1044,7 @@ void DstarD0TTree::beginJob(){
 	data->Branch("D0fromDSsXY",&D0fromDSsXY_vec);
 	//data->Branch("triggers",&triggers);
 
-//======================================================
+    //======================================================
 	// D0 Variables
 	//======================================================
 
