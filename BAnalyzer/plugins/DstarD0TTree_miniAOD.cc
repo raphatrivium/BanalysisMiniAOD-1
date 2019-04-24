@@ -159,7 +159,7 @@ void DstarD0TTree::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	runNumber= iEvent.id().run();
 	eventNumber= iEvent.id().event();
 	lumi= iEvent.luminosityBlock();
-
+	
 	Handle<double> lumiWeight;
 	iEvent.getByLabel("lumiWeight",lumiWeight);
 
@@ -178,6 +178,8 @@ void DstarD0TTree::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	//Primary Vtx	  
 	edm::Handle<VertexCollection> recVtxs; //access that VertexCollection
 	iEvent.getByToken(vtxToken_,recVtxs);
+
+	Total_Events++;
 
 	//Only events in which the path actually fired had stored the filter results and products:    
     bool triggerFired = TriggerInfo(iEvent,triggerBits,triggerPrescales,triggerName_);
@@ -262,7 +264,7 @@ void DstarD0TTree::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 			if(iTrack1->pseudoTrack().normalizedChi2() > 2.5) continue;
 			//Pion and kaon candidates Tracks with pt > 0.6 GeV/c
 			
-            cout << "iTrack1->dxy(): " << iTrack1->dxy() << endl;
+            //cout << "iTrack1->dxy(): " << iTrack1->dxy() << endl;
 			reco::TransientTrack  PionTT = theB->build(iTrack1->pseudoTrack());
 			if (debug)cout << " PionTT "  << PionTT.track().momentum() << endl;
 			goodTracks.push_back(PionTT); //Pion and kaon candidates Tracks with pt > 0.6 GeV/c
@@ -296,26 +298,26 @@ void DstarD0TTree::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	        }
 	    }
 
-    const Vertex& RecVtx = (*recVtxs)[VtxIn];
+    	const Vertex& RecVtx = (*recVtxs)[VtxIn];
 
-	n_pVertex = recVtxs->size();
+		n_pVertex = recVtxs->size();
 
-	PVx = RecVtx.x();
-	PVy = RecVtx.y();
-	PVz = RecVtx.z();
-	PVerrx=RecVtx.xError();
-	PVerry=RecVtx.yError();
-    PVerrz=RecVtx.zError();
+		PVx = RecVtx.x();
+		PVy = RecVtx.y();
+		PVz = RecVtx.z();
+		PVerrx=RecVtx.xError();
+		PVerry=RecVtx.yError();
+    	PVerrz=RecVtx.zError();
 
 
-RecDstar(iEvent,iSetup,RecVtx); //Reconstruction of D*
-RecD0(iEvent,iSetup,RecVtx);    //Reconstruction of prompt D0
-//FindAngle(RecVtx,v_D0,d0kpi_p4); //Calculates the opening angle
-//GenDstarInfo(iEvent,iSetup); //Stores information from D0 and its products.
-//GenD0Info(iEvent,iSetup); //Stores information from D0 and its products.
-//      FindAngleMCpromptD0(p);
+		RecDstar(iEvent,iSetup,RecVtx); //Reconstruction of D*
+		RecD0(iEvent,iSetup,RecVtx);    //Reconstruction of prompt D0
+		//FindAngle(RecVtx,v_D0,d0kpi_p4); //Calculates the opening angle
+		//GenDstarInfo(iEvent,iSetup); //Stores information from D0 and its products.
+		//GenD0Info(iEvent,iSetup); //Stores information from D0 and its products.
+		//      FindAngleMCpromptD0(p);
 
-data->Fill();
+		data->Fill();
     }
 }
 
@@ -456,9 +458,13 @@ void DstarD0TTree::RecDstar(const edm::Event& iEvent, const edm::EventSetup& iSe
 				D0_Vtxerry.push_back(v.positionError().cyy());
 				D0_Vtxerrz.push_back(v.positionError().czz());
 
+				TrkKmass.push_back(p4_K.M());
+				Trkpimass.push_back(p4_pi.M());
+				TrkSmass.push_back(p4_S.M());
+
 				TrkKdxy.push_back(K_f.track().dxy(RecVtx.position()));
 				Trkpidxy.push_back(pi_f.track().dxy(RecVtx.position()));
-                cout << "pi_f.track(): " << pi_f.track().dxy(RecVtx.position()) << endl;
+                //cout << "pi_f.track(): " << pi_f.track().dxy(RecVtx.position()) << endl;
 				TrkSdxy.push_back(trkS.track().dxy(RecVtx.position()));
 
 				TrkKdz.push_back(K_f.track().dz(RecVtx.position()));
@@ -917,7 +923,7 @@ void DstarD0TTree::initialize(){
 
 	nHFPlus = 0; nHFMinus = 0;
 
-	D0_VtxProb.clear(); D0mass.clear();Dsmass.clear();D0pt.clear();Dspt.clear();D0eta.clear();
+	D0_VtxProb.clear(); D0mass.clear(); TrkKmass.clear(); Trkpimass.clear(); TrkSmass.clear();Dsmass.clear();D0pt.clear();Dspt.clear();D0eta.clear();
 	D0phi.clear();Dseta.clear();Dsphi.clear();D0_VtxPosx.clear();D0_VtxPosy.clear();D0_VtxPosz.clear();D0_Vtxerrx.clear(); D0_Vtxerry.clear();
 	D0_Vtxerrz.clear();TrkKdxy.clear();Trkpidxy.clear();
 	TrkSdxy.clear();TrkKdz.clear();Trkpidz.clear();TrkSdz.clear();
@@ -979,6 +985,8 @@ void DstarD0TTree::beginJob(){
  
 	data->Branch("D0Candidates",&D0Candidates,"D0Candidates/I");
 	data->Branch("DsCandidates",&DsCandidates,"DsCandidates/I");
+	data->Branch("Total_Events",&Total_Events,"Total_Events/I"); 
+	data->Branch("countInTriggered",&countInTriggered,"countInTriggered/I");
 	data->Branch("NdsKpiMC",&NdsKpiMC,"NdsKpiMC/I");
 
 	data->Branch("runNumber",&runNumber,"runNumber/I");
@@ -995,6 +1003,7 @@ void DstarD0TTree::beginJob(){
 	data->Branch("PVerrz",&PVerrz,"PVerrz/D");
 	data->Branch("ntracksD0Kpi",&ntracksD0Kpi,"ntracksD0Kpi/I");
 	data->Branch("ntracksDstar",&ntracksDstar,"ntracksDstar/I");
+	
 
 	data->Branch("procId",&procId,"procId/I");
 
@@ -1017,6 +1026,9 @@ void DstarD0TTree::beginJob(){
 	data->Branch("D0phi",&D0phi);
 	data->Branch("Dseta",&Dseta);
 	data->Branch("Dsphi",&Dsphi);
+	data->Branch("TrkKmass",&TrkKmass);
+	data->Branch("Trkpimass",&Trkpimass);
+	data->Branch("TrkSmass",&TrkSmass);
 	data->Branch("TrkKpt",&TrkKpt);
 	data->Branch("Trkpipt",&Trkpipt);
 	data->Branch("TrkSpt",&TrkSpt);
