@@ -12,3 +12,5 @@ Traceback (most recent call last):
   File "/cvmfs/cms.cern.ch/crab3/slc6_amd64_gcc493/cms/crabclient/3.3.1904/lib/python2.7/site-packages/CRABClient/Commands/SubCommand.py", line 586, in validateOptions
     raise ConfigurationException(msg)
 ConfigurationException: [91mError[0m: crab_Run2018A/crab_Bparking_Run2018Als is not a valid CRAB project directory.
+DEBUG 2019-04-24 17:10:09,796: 	 Executing command: 'resubmit'
+DEBUG 2019-04-24 17:10:09,796: 	 Found CRAB cache file /afs/cern.ch/user/r/ragomesd/.crab3
