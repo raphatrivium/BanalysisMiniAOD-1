@@ -1020,7 +1020,7 @@ void DstarD0TTree::beginJob(){
 	data->Branch("DsCandidates",&DsCandidates,"DsCandidates/I");
 	data->Branch("Total_Events",&Total_Events,"Total_Events/I"); 
 	data->Branch("countInTriggered",&countInTriggered,"countInTriggered/I");
-	//data->Branch("TriggerName", &NameTrigger);
+	data->Branch("TriggerName", &NameTrigger);
 	data->Branch("NdsKpiMC",&NdsKpiMC,"NdsKpiMC/I");
 
 	data->Branch("runNumber",&runNumber,"runNumber/I");
