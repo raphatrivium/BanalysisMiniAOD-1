@@ -109,19 +109,19 @@ using namespace edm;
 DstarD0TTree::DstarD0TTree(const edm::ParameterSet& iConfig):
 	doMC(iConfig.getParameter<bool>("doMC")),
 	doRec(iConfig.getParameter<bool>("doRec")),
-        debug(iConfig.getUntrackedParameter<bool>("debug",false)),
-        triggerName_(iConfig.getUntrackedParameter<std::string>("PathName","HLT_Mu9_IP6_part0_v1")),        
- //Triggers
-        triggerBits_(consumes<edm::TriggerResults>(iConfig.getParameter<edm::InputTag>("bits"))),
-        //triggerObjects_(consumes<std::vector<pat::TriggerObjectStandAlone> >(iConfig.getParameter<edm::InputTag>("objects"))),
-        triggerPrescales_(consumes<pat::PackedTriggerPrescales>(iConfig.getParameter<edm::InputTag>("prescales"))),
+	debug(iConfig.getUntrackedParameter<bool>("debug",false)),
+	triggerName_(iConfig.getUntrackedParameter<std::string>("PathName","HLT_Mu9_IP6_part0_v1")),        
+ 	//Triggers
+	triggerBits_(consumes<edm::TriggerResults>(iConfig.getParameter<edm::InputTag>("bits"))),
+    //triggerObjects_(consumes<std::vector<pat::TriggerObjectStandAlone> >(iConfig.getParameter<edm::InputTag>("objects"))),
+	triggerPrescales_(consumes<pat::PackedTriggerPrescales>(iConfig.getParameter<edm::InputTag>("prescales"))),
 
 	trkToken_(consumes<edm::View<pat::PackedCandidate>>(iConfig.getParameter<edm::InputTag>("tracks"))), //MiniAOD
 	vtxToken_(consumes<reco::VertexCollection>(iConfig.getParameter<edm::InputTag>("recVtxs"))),
 	comEnergy_(iConfig.getParameter<double>("comEnergy"))
 {     
-        counter = 0;
-        countInTriggered = 0;
+	counter = 0;
+	countInTriggered = 0;
 	Ebeam_ = comEnergy_/2.;
 	edm::Service<TFileService> fs;
 	data = fs->make<TTree>("data","data");
@@ -184,6 +184,12 @@ void DstarD0TTree::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	//Only events in which the path actually fired had stored the filter results and products:    
     bool triggerFired = TriggerInfo(iEvent,triggerBits,triggerPrescales,triggerName_);
     if(triggerFired) countInTriggered++;
+
+	TString triggername = TriggerName(iEvent,triggerBits,triggerPrescales,triggerName_);
+	cout << "triggername: " << triggername << endl;
+	NameTrigger.push_back(triggername);
+
+	//void triggerFired = TriggerName(iEvent,triggerBits,triggerPrescales,triggerName_);
 
    /* countInTriggered++;
 
@@ -271,7 +277,7 @@ void DstarD0TTree::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 
 	    }
 		// SELECTING TRACKS FOR D0 ,  χ2 < 5.0, Nhits > 5; pt > 0.15 GeV/c, p > 1.0 GeV/c, |dz| < 0.5 cm; |dxy| < 0.1 cm	i             
-		if(fabs(iTrack1->eta())<2.5 && iTrack1->pseudoTrack().normalizedChi2() < 5.0 && iTrack1->pseudoTrack().hitPattern().numberOfValidHits() >= 5 && iTrack1->pt() > 0.5 && iTrack1->p() >1.0 && fabs(iTrack1->dz())<0.5 && fabs(iTrack1->dxy())<0.1)
+		if(fabs(iTrack1->eta())<2.5 && iTrack1->pseudoTrack().normalizedChi2() < 5.0 && iTrack1->pseudoTrack().hitPattern().numberOfValidHits() >= 5 && iTrack1->pseudoTrack().hitPattern().numberOfValidPixelHits() >= 2 && iTrack1->pt() > 0.5 && iTrack1->p() >1.0 && fabs(iTrack1->dz())<0.5 && fabs(iTrack1->dxy())<0.1)
         {
 			reco::TransientTrack  D0TT = theB->build(iTrack1->pseudoTrack());
 			//goodTracksD0.push_back(D0TT);
@@ -323,24 +329,39 @@ void DstarD0TTree::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 
 //*********************************************************************************
 bool DstarD0TTree::TriggerInfo(const edm::Event& iEvent, edm::Handle<edm::TriggerResults> itriggerBits, edm::Handle<pat::PackedTriggerPrescales> itriggerPrescales, TString trigname){
- const edm::TriggerNames &names = iEvent.triggerNames(*itriggerBits);
+	const edm::TriggerNames &names = iEvent.triggerNames(*itriggerBits);
     std::cout << "\n == TRIGGER PATHS FOUND = " << std::endl;
-    for (unsigned int i = 0, n = itriggerBits->size(); i < n; ++i) {
-         TString trigName = names.triggerName(i);
-         if(trigName.Contains(trigname)) { 
-          std::cout << "Trigger " << names.triggerName(i) <<
-                ", prescale " << itriggerPrescales->getPrescaleForIndex(i) <<
-                ": " << (itriggerBits->accept(i) ? "PASS" : "fail (or not run)")
-                << std::endl;
-               return true; 
-             }
-                
-           }
-
-       return false;
-
+    for (unsigned int i = 0, n = itriggerBits->size(); i < n; ++i) 
+	{
+		TString trigName = names.triggerName(i);
+		if(trigName.Contains(trigname)) 
+		{ 
+			std::cout << "Trigger " << names.triggerName(i) <<
+			", prescale " << itriggerPrescales->getPrescaleForIndex(i) <<
+			": " << (itriggerBits->accept(i) ? "PASS" : "fail (or not run)")
+			<< std::endl;
+			return true; 
+        }     	
+	}
+	return false;
 }
-
+//*********************************************************************************
+TString DstarD0TTree::TriggerName(const edm::Event& iEvent, edm::Handle<edm::TriggerResults> itriggerBits, edm::Handle<pat::PackedTriggerPrescales> itriggerPrescales, TString trigname){
+	const edm::TriggerNames &names = iEvent.triggerNames(*itriggerBits);
+    //std::cout << "\n == TRIGGER PATHS FOUND = " << std::endl;
+    for (unsigned int i = 0, n = itriggerBits->size(); i < n; ++i) 
+	{
+		TString trigName = names.triggerName(i);
+		
+		if(trigName.Contains(trigname)) 
+		{ 
+			//std::cout << "Trigger " << names.triggerName(i) << ", prescale " << itriggerPrescales->getPrescaleForIndex(i) << ": " << (itriggerBits->accept(i) ? "PASS" : "fail (or not run)") << std::endl;
+			return trigName; 
+        }             	       
+    }
+	TString trigNameNot = "others";
+	return trigNameNot;       
+}
 //***********************************************************************************
 void DstarD0TTree::RecDstar(const edm::Event& iEvent, const edm::EventSetup& iSetup, const reco::Vertex& RecVtx){
 
@@ -408,7 +429,7 @@ void DstarD0TTree::RecDstar(const edm::Event& iEvent, const edm::EventSetup& iSe
 				math::XYZTLorentzVector p4_S(trkS.track().px(),trkS.track().py(),trkS.track().pz(),sqrt(pow(trkS.track().p(),2)+pow(pi_mass,2)));
 				math::XYZTLorentzVector ip4_DS = ip4_D0 + p4_S;
 				if((ip4_DS.M() - ip4_D0.M()) > 0.3) continue;
-                                //  cout << "ip4_DS.M() :" << ip4_DS.M() << " ip4_D0.M(): " << ip4_D0.M() << endl;
+ 				//cout << "ip4_DS.M() :" << ip4_DS.M() << " ip4_D0.M(): " << ip4_D0.M() << endl;
                                 
 				//KalmanVertexFitter
 				vector<TransientTrack> tks;
@@ -427,17 +448,27 @@ void DstarD0TTree::RecDstar(const edm::Event& iEvent, const edm::EventSetup& iSe
 				double D0fromDSeXY = vD0fromDSdXY.distance(RecVtx,v).error() ;
 				double D0fromDSsXY =  D0fromDSdXY / D0fromDSeXY;
 
+				//D0 significance 3D
+				VertexDistance3D vD0Kpid3D ;
+				double D0fromDSd3D = vD0Kpid3D.distance(RecVtx,v).value() ;
+				double D0fromDSe3D = vD0Kpid3D.distance(RecVtx,v).error() ;
+				double D0fromDSs3D = D0fromDSd3D / D0fromDSe3D;
+				//cout << "significance 3D: "<< D0fromDSs3D << endl;
+
+				if( D0fromDSs3D < 3 ) continue; //significance 3D cut
+
 				//D* 4-momentum Reconstruction after KalmanVertexFitter
 				math::XYZTLorentzVector p4_K(K_f.track().px(),K_f.track().py(),K_f.track().pz(),sqrt(pow(K_f.track().p(),2)+pow(k_mass,2)));
 				math::XYZTLorentzVector p4_pi(pi_f.track().px(),pi_f.track().py(),pi_f.track().pz(),sqrt(pow(pi_f.track().p(),2)+pow(pi_mass,2)));
 				math::XYZTLorentzVector d0_p4 = p4_K + p4_pi;
-				double d0mass = d0_p4.M();
+				double d0mass = d0_p4.M();				
 
 				if(fabs(d0mass - 1.86484)>0.2) continue;
 				D0Candidates++; //Number of D0 candidates
 
 				math::XYZTLorentzVector dS_p4 = d0_p4 + p4_S;
 				double dsmass = dS_p4.M();
+
 				if( (dsmass - d0mass) > 0.16) continue;
 				DsCandidates++; //Number of D* candidates
 				
@@ -923,6 +954,8 @@ void DstarD0TTree::initialize(){
 
 	nHFPlus = 0; nHFMinus = 0;
 
+	
+	NameTrigger.clear();
 	D0_VtxProb.clear(); D0mass.clear(); TrkKmass.clear(); Trkpimass.clear(); TrkSmass.clear();Dsmass.clear();D0pt.clear();Dspt.clear();D0eta.clear();
 	D0phi.clear();Dseta.clear();Dsphi.clear();D0_VtxPosx.clear();D0_VtxPosy.clear();D0_VtxPosz.clear();D0_Vtxerrx.clear(); D0_Vtxerry.clear();
 	D0_Vtxerrz.clear();TrkKdxy.clear();Trkpidxy.clear();
@@ -987,6 +1020,7 @@ void DstarD0TTree::beginJob(){
 	data->Branch("DsCandidates",&DsCandidates,"DsCandidates/I");
 	data->Branch("Total_Events",&Total_Events,"Total_Events/I"); 
 	data->Branch("countInTriggered",&countInTriggered,"countInTriggered/I");
+	//data->Branch("TriggerName", &NameTrigger);
 	data->Branch("NdsKpiMC",&NdsKpiMC,"NdsKpiMC/I");
 
 	data->Branch("runNumber",&runNumber,"runNumber/I");
