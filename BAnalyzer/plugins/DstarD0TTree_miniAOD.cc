@@ -185,9 +185,7 @@ void DstarD0TTree::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     bool triggerFired = TriggerInfo(iEvent,triggerBits,triggerPrescales,triggerName_);
     if(triggerFired) countInTriggered++;
 
-	TString triggername = TriggerName(iEvent,triggerBits,triggerPrescales,triggerName_);
-	cout << "triggername: " << triggername << endl;
-	NameTrigger.push_back(triggername);
+	NameTrigger.push_back(triggerName_);
 
 	//void triggerFired = TriggerName(iEvent,triggerBits,triggerPrescales,triggerName_);
 
@@ -345,23 +343,7 @@ bool DstarD0TTree::TriggerInfo(const edm::Event& iEvent, edm::Handle<edm::Trigge
 	}
 	return false;
 }
-//*********************************************************************************
-TString DstarD0TTree::TriggerName(const edm::Event& iEvent, edm::Handle<edm::TriggerResults> itriggerBits, edm::Handle<pat::PackedTriggerPrescales> itriggerPrescales, TString trigname){
-	const edm::TriggerNames &names = iEvent.triggerNames(*itriggerBits);
-    //std::cout << "\n == TRIGGER PATHS FOUND = " << std::endl;
-    for (unsigned int i = 0, n = itriggerBits->size(); i < n; ++i) 
-	{
-		TString trigName = names.triggerName(i);
-		
-		if(trigName.Contains(trigname)) 
-		{ 
-			//std::cout << "Trigger " << names.triggerName(i) << ", prescale " << itriggerPrescales->getPrescaleForIndex(i) << ": " << (itriggerBits->accept(i) ? "PASS" : "fail (or not run)") << std::endl;
-			return trigName; 
-        }             	       
-    }
-	TString trigNameNot = "others";
-	return trigNameNot;       
-}
+
 //***********************************************************************************
 void DstarD0TTree::RecDstar(const edm::Event& iEvent, const edm::EventSetup& iSetup, const reco::Vertex& RecVtx){
 
