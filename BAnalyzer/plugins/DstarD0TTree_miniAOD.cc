@@ -400,15 +400,17 @@ void DstarD0TTree::RecDstar(const edm::Event& iEvent, const edm::EventSetup& iSe
 					pi = trk2;
 				}		
                                
-				//D0 4-momentum Reconstruction
+				//D0 4-momentum Reconstruction (kaon and pion)
 				math::XYZTLorentzVector ip4_K(K.track().px(),K.track().py(),K.track().pz(),sqrt(pow(K.track().p(),2)+pow(k_mass,2)));
 				math::XYZTLorentzVector ip4_pi(pi.track().px(),pi.track().py(),pi.track().pz(),sqrt(pow(pi.track().p(),2)+pow(pi_mass,2)));        
 				math::XYZTLorentzVector ip4_D0 = ip4_K + ip4_pi;
 
 				if( fabs(ip4_D0.M()-1.86484)  > 1.) continue;
 
-				//D* 4-momentum Reconstruction
+				//SlowPion 4-momentum Reconstruction
 				math::XYZTLorentzVector p4_S(trkS.track().px(),trkS.track().py(),trkS.track().pz(),sqrt(pow(trkS.track().p(),2)+pow(pi_mass,2)));
+
+                //D* 4-momentum Reconstruction (D0 + SlowPion)
 				math::XYZTLorentzVector ip4_DS = ip4_D0 + p4_S;
 				if((ip4_DS.M() - ip4_D0.M()) > 0.3) continue;
  				//cout << "ip4_DS.M() :" << ip4_DS.M() << " ip4_D0.M(): " << ip4_D0.M() << endl;
@@ -445,14 +447,17 @@ void DstarD0TTree::RecDstar(const edm::Event& iEvent, const edm::EventSetup& iSe
 				math::XYZTLorentzVector d0_p4 = p4_K + p4_pi;
 				double d0mass = d0_p4.M();				
 
-				if(fabs(d0mass - 1.86484)>0.2) continue;
-				D0Candidates++; //Number of D0 candidates
-
 				math::XYZTLorentzVector dS_p4 = d0_p4 + p4_S;
 				double dsmass = dS_p4.M();
 
-				if( (dsmass - d0mass) > 0.16) continue;
+				//Difference between D* and D0
+				if( (dsmass - d0mass) > 0.16) continue; 
 				DsCandidates++; //Number of D* candidates
+
+				if(fabs(d0mass - 1.86484)>0.2) continue;
+
+				if( D0fromDSs3D < 5 ) continue; //significance 3D cut
+				D0Candidates++; //Number of D0 candidates
 				
 				D0_VtxProb.push_back(vtxProb);
 				D0mass.push_back(d0_p4.M());
