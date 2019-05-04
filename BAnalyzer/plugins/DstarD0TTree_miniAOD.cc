@@ -110,7 +110,7 @@ DstarD0TTree::DstarD0TTree(const edm::ParameterSet& iConfig):
 	doMC(iConfig.getParameter<bool>("doMC")),
 	doRec(iConfig.getParameter<bool>("doRec")),
 	debug(iConfig.getUntrackedParameter<bool>("debug",false)),
-	triggerName_(iConfig.getUntrackedParameter<std::string>("PathName","HLT_Mu9_IP6_part0_v1")),        
+	triggerName_(iConfig.getUntrackedParameter<std::string>("PathName","HLT_Mu9_IP6_part0_v2")),        
  	//Triggers
 	triggerBits_(consumes<edm::TriggerResults>(iConfig.getParameter<edm::InputTag>("bits"))),
     //triggerObjects_(consumes<std::vector<pat::TriggerObjectStandAlone> >(iConfig.getParameter<edm::InputTag>("objects"))),

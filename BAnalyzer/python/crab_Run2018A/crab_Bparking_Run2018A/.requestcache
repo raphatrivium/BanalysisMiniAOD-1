@@ -175,7 +175,7 @@ S'LumiBased'
 p66
 sS'unitsPerJob'
 p67
-I20
+I50
 sg13
 S''
 sg14
@@ -269,7 +269,7 @@ S'prod'
 p98
 sS'RequestName'
 p99
-V190424_045033:ragomesd_crab_Bparking_Run2018A
+V190502_025752:ragomesd_crab_Bparking_Run2018A
 p100
 sS'voRole'
 p101

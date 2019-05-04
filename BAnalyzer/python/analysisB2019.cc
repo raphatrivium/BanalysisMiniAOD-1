@@ -48,8 +48,8 @@ using namespace std;
 int analysisB2019()
 {
 	//call a file for a histogram style (Optional)
-	//gROOT->LoadMacro("styleTDR.C"); 
-	//setTDRStyle();
+	gROOT->LoadMacro("styleTDR.C"); 
+	setTDRStyle();
 
 	//counters for file f1 (pythia)
 	int count_Total_Events_pythia = 0;
@@ -229,7 +229,7 @@ int analysisB2019()
 	//-----------------------------------------------------------------------------
 
 	//-------Reading the root file and the tree-------------------------------------	
-	TFile *f1 = new TFile("D0DstarData_12c.root");
+	TFile *f1 = new TFile("D0DstarData_test1_5.root");
 	TTree *t1 = (TTree*)f1->Get("analysis/data");
 
 	//---------------------------------------------------------------------------------
@@ -519,13 +519,13 @@ int analysisB2019()
 	TCanvas* c1 = new TCanvas("c1","Canvas 1 - behavior of the D",1200,600);
 	c1->Divide(2);
 	c1->cd(1);
-	D0mass_Histo->SetLineColor(kBlue);
+	//D0mass_Histo->SetLineColor(kBlue);
 	D0mass_Histo->SetMarkerStyle(7);
-	D0mass_Histo->SetMarkerStyle(21);
+	//D0mass_Histo->SetMarkerStyle(21);
 	//D0mass_Histo->SetStats(0);
-	D0mass_Histo->SetMarkerColor(kBlue);
-	D0mass_Histo->SetFillColor(kBlue);
-	D0mass_Histo->Draw("HIST");
+	//D0mass_Histo->SetMarkerColor(kBlue);
+	//D0mass_Histo->SetFillColor(kBlue);
+	D0mass_Histo->Draw("e1p");
 	//D0mass_Histo->Draw("e1pSAME");
 	TLegend* leg_D0mass = new TLegend(0.82,0.5,0.95,0.65);
    	leg_D0mass->SetFillColor(kWhite);
@@ -536,13 +536,13 @@ int analysisB2019()
 	leg_D0mass->Draw();
 	//-------------------------------------------------------------------------
 	c1->cd(2);
-	Dsmass_Histo->SetLineColor(kBlue);
+	//Dsmass_Histo->SetLineColor(kBlue);
 	Dsmass_Histo->SetMarkerStyle(7);
-	Dsmass_Histo->SetMarkerStyle(21);
+	//Dsmass_Histo->SetMarkerStyle(21);
 	//Dsmass_Histo->SetStats(0);
-	Dsmass_Histo->SetMarkerColor(kBlue);
-	Dsmass_Histo->SetFillColor(kBlue);
-	Dsmass_Histo->Draw("HIST");
+	//Dsmass_Histo->SetMarkerColor(kBlue);
+	//Dsmass_Histo->SetFillColor(kBlue);
+	Dsmass_Histo->Draw("e1p");
 	//Dsmass_Histo->Draw("e1pSAME");
 	TLegend* leg_Dsmass = new TLegend(0.82,0.5,0.95,0.65);
    	leg_Dsmass->SetFillColor(kWhite);
@@ -558,12 +558,12 @@ int analysisB2019()
 	TCanvas* c2 = new TCanvas("c2","Canvas 2 - behavior of the D",1200,600);
 	c2->Divide(2,2);
 	c2->cd(1);
-	D0eta_Histo->SetLineColor(kBlue);
+	//D0eta_Histo->SetLineColor(kBlue);
 	D0eta_Histo->SetMarkerStyle(7);
-	D0eta_Histo->SetMarkerStyle(21);
+	//D0eta_Histo->SetMarkerStyle(21);
 	//D0eta_Histo->SetStats(0);
-	D0eta_Histo->SetMarkerColor(kBlue);
-	D0eta_Histo->SetFillColor(kBlue);
+	//D0eta_Histo->SetMarkerColor(kBlue);
+	//D0eta_Histo->SetFillColor(kBlue);
 	D0eta_Histo->Draw("HIST");
 	//D0eta_Histo->Draw("e1pSAME");
 	TLegend* leg_D0eta = new TLegend(0.82,0.5,0.95,0.65);
@@ -575,12 +575,12 @@ int analysisB2019()
 	leg_D0eta->Draw();
 	//-------------------------------------------------------------------------
 	c2->cd(2);
-	Dseta_Histo->SetLineColor(kBlue);
+	//Dseta_Histo->SetLineColor(kBlue);
 	Dseta_Histo->SetMarkerStyle(7);
-	Dseta_Histo->SetMarkerStyle(21);
+	//Dseta_Histo->SetMarkerStyle(21);
 	//Dseta_Histo->SetStats(0);
-	Dseta_Histo->SetMarkerColor(kBlue);
-	Dseta_Histo->SetFillColor(kBlue);
+	//Dseta_Histo->SetMarkerColor(kBlue);
+	//Dseta_Histo->SetFillColor(kBlue);
 	Dseta_Histo->Draw("HIST");
 	//Dsmass_Histo->Draw("e1pSAME");	
 	TLegend* leg_Dseta = new TLegend(0.82,0.5,0.95,0.65);
@@ -592,12 +592,12 @@ int analysisB2019()
 	leg_Dseta->Draw();
 	//-------------------------------------------------------------------------
 	c2->cd(3);
-	D0phi_Histo->SetLineColor(kBlue);
+	//D0phi_Histo->SetLineColor(kBlue);
 	D0phi_Histo->SetMarkerStyle(7);
-	D0phi_Histo->SetMarkerStyle(21);
+	//D0phi_Histo->SetMarkerStyle(21);
 	//D0phi_Histo->SetStats(0);
-	D0phi_Histo->SetMarkerColor(kBlue);
-	D0phi_Histo->SetFillColor(kBlue);
+	//D0phi_Histo->SetMarkerColor(kBlue);
+	//D0phi_Histo->SetFillColor(kBlue);
 	D0phi_Histo->Draw("HIST");
 	//D0eta_Histo->Draw("e1pSAME");
 	TLegend* leg_D0phi = new TLegend(0.82,0.5,0.95,0.65);
@@ -609,12 +609,12 @@ int analysisB2019()
 	leg_D0phi->Draw();
 	//-------------------------------------------------------------------------
 	c2->cd(4);	
-	Dsphi_Histo->SetLineColor(kBlue);
+	//Dsphi_Histo->SetLineColor(kBlue);
 	Dsphi_Histo->SetMarkerStyle(7);
-	Dsphi_Histo->SetMarkerStyle(21);
+	//Dsphi_Histo->SetMarkerStyle(21);
 	//Dseta_Histo->SetStats(0);
-	Dsphi_Histo->SetMarkerColor(kBlue);
-	Dsphi_Histo->SetFillColor(kBlue);
+	//Dsphi_Histo->SetMarkerColor(kBlue);
+	//Dsphi_Histo->SetFillColor(kBlue);
 	Dsphi_Histo->Draw("HIST");
 	//Dsphi_Histo->Draw("e1pSAME");	
 	TLegend* leg_Dsphi = new TLegend(0.82,0.5,0.95,0.65);
@@ -630,12 +630,12 @@ int analysisB2019()
 	TCanvas* c3 = new TCanvas("c3","Canvas 3 - behavior of the SlowPion",1200,600);
 	c3->Divide(2,2);
 	c3->cd(1);
-	TrkSpt_Histo->SetLineColor(kBlue);
+	//TrkSpt_Histo->SetLineColor(kBlue);
 	TrkSpt_Histo->SetMarkerStyle(7);
 	TrkSpt_Histo->SetMarkerStyle(21);
 	//TrkSpt_Histo->SetStats(0);
-	TrkSpt_Histo->SetMarkerColor(kBlue);
-	TrkSpt_Histo->SetFillColor(kBlue);
+	//TrkSpt_Histo->SetMarkerColor(kBlue);
+	//TrkSpt_Histo->SetFillColor(kBlue);
 	TrkSpt_Histo->Draw("HIST");
 	//TrkSpt_Histo->Draw("e1pSAME");
 	TLegend* leg_TrkSpt = new TLegend(0.82,0.5,0.95,0.65);
@@ -647,12 +647,12 @@ int analysisB2019()
 	leg_TrkSpt->Draw();
 	//-------------------------------------------------------------------------
 	c3->cd(2);
-	TrkSnhits_Histo->SetLineColor(kBlue);
+	//TrkSnhits_Histo->SetLineColor(kBlue);
 	TrkSnhits_Histo->SetMarkerStyle(7);
-	TrkSnhits_Histo->SetMarkerStyle(21);
+	//TrkSnhits_Histo->SetMarkerStyle(21);
 	//TrkSnhits_Histo->SetStats(0);
-	TrkSnhits_Histo->SetMarkerColor(kBlue);
-	TrkSnhits_Histo->SetFillColor(kBlue);
+	//TrkSnhits_Histo->SetMarkerColor(kBlue);
+	//TrkSnhits_Histo->SetFillColor(kBlue);
 	TrkSnhits_Histo->Draw("HIST");
 	//Dsphi_Histo->Draw("e1pSAME");
 	TLegend* leg_TrkSnhits = new TLegend(0.82,0.5,0.95,0.65);
@@ -664,12 +664,12 @@ int analysisB2019()
 	leg_TrkSnhits->Draw();
 	//-------------------------------------------------------------------------
 	c3->cd(3);
-	TrkSdxy_Histo->SetLineColor(kBlue);
+	//TrkSdxy_Histo->SetLineColor(kBlue);
 	TrkSdxy_Histo->SetMarkerStyle(7);
-	TrkSdxy_Histo->SetMarkerStyle(21);
+	//TrkSdxy_Histo->SetMarkerStyle(21);
 	//TrkSnhits_Histo->SetStats(0);
-	TrkSdxy_Histo->SetMarkerColor(kBlue);
-	TrkSdxy_Histo->SetFillColor(kBlue);
+	//TrkSdxy_Histo->SetMarkerColor(kBlue);
+	//TrkSdxy_Histo->SetFillColor(kBlue);
 	TrkSdxy_Histo->Draw("HIST");
 	//TrkSdxy_Histo->Draw("e1pSAME");
 	TLegend* leg_TrkSdxy = new TLegend(0.82,0.5,0.95,0.65);
@@ -681,12 +681,12 @@ int analysisB2019()
 	leg_TrkSdxy->Draw();
 	//-------------------------------------------------------------------------
 	c3->cd(4);
-	TrkSdz_Histo->SetLineColor(kBlue);
+	//TrkSdz_Histo->SetLineColor(kBlue);
 	TrkSdz_Histo->SetMarkerStyle(7);
-	TrkSdz_Histo->SetMarkerStyle(21);
+	//TrkSdz_Histo->SetMarkerStyle(21);
 	//TrkSdz_Histo->SetStats(0);
-	TrkSdz_Histo->SetMarkerColor(kBlue);
-	TrkSdz_Histo->SetFillColor(kBlue);
+	//TrkSdz_Histo->SetMarkerColor(kBlue);
+	//TrkSdz_Histo->SetFillColor(kBlue);
 	TrkSdz_Histo->Draw("HIST");
 	//TrkSdz_Histo->Draw("e1pSAME");
 	TLegend* leg_TrkSdz = new TLegend(0.82,0.5,0.95,0.65);
@@ -702,12 +702,12 @@ int analysisB2019()
 	TCanvas* c4 = new TCanvas("c4","Canvas 4 - behavior of the SlowPion",1200,600);
 	c4->Divide(2,2);
 	c4->cd(1);
-	TrkSeta_Histo->SetLineColor(kBlue);
+	//TrkSeta_Histo->SetLineColor(kBlue);
 	TrkSeta_Histo->SetMarkerStyle(7);
-	TrkSeta_Histo->SetMarkerStyle(21);
+	//TrkSeta_Histo->SetMarkerStyle(21);
 	//TrkSeta_Histo->SetStats(0);
-	TrkSeta_Histo->SetMarkerColor(kBlue);
-	TrkSeta_Histo->SetFillColor(kBlue);
+	//TrkSeta_Histo->SetMarkerColor(kBlue);
+	//TrkSeta_Histo->SetFillColor(kBlue);
 	TrkSeta_Histo->Draw("HIST");
 	//TrkSeta_Histo->Draw("e1pSAME");
 	TLegend* leg_TrkSeta = new TLegend(0.82,0.5,0.95,0.65);
@@ -719,12 +719,12 @@ int analysisB2019()
 	leg_TrkSeta->Draw();
 	//-------------------------------------------------------------------------
 	c4->cd(2);
-	TrkSphi_Histo->SetLineColor(kBlue);
+	//TrkSphi_Histo->SetLineColor(kBlue);
 	TrkSphi_Histo->SetMarkerStyle(7);
-	TrkSphi_Histo->SetMarkerStyle(21);
+	//TrkSphi_Histo->SetMarkerStyle(21);
 	//TrkSphi_Histo->SetStats(0);
-	TrkSphi_Histo->SetMarkerColor(kBlue);
-	TrkSphi_Histo->SetFillColor(kBlue);
+	//TrkSphi_Histo->SetMarkerColor(kBlue);
+	//TrkSphi_Histo->SetFillColor(kBlue);
 	TrkSphi_Histo->Draw("HIST");
 	//TrkSphi_Histo->Draw("e1pSAME");
 	TLegend* leg_TrkSphi = new TLegend(0.82,0.5,0.95,0.65);
@@ -736,12 +736,12 @@ int analysisB2019()
 	leg_TrkSphi->Draw();
 	//-------------------------------------------------------------------------
 	c4->cd(3);
-	TrkSchi2_Histo->SetLineColor(kBlue);
+	//TrkSchi2_Histo->SetLineColor(kBlue);
 	TrkSchi2_Histo->SetMarkerStyle(7);
-	TrkSchi2_Histo->SetMarkerStyle(21);
+	//TrkSchi2_Histo->SetMarkerStyle(21);
 	//TrkSchi2_Histo->SetStats(0);
-	TrkSchi2_Histo->SetMarkerColor(kBlue);
-	TrkSchi2_Histo->SetFillColor(kBlue);
+	//TrkSchi2_Histo->SetMarkerColor(kBlue);
+	//TrkSchi2_Histo->SetFillColor(kBlue);
 	TrkSchi2_Histo->Draw("HIST");
 	//TrkSchi2_Histo->Draw("e1pSAME");
 	TLegend* leg_TrkSchi2 = new TLegend(0.82,0.5,0.95,0.65);
@@ -757,12 +757,12 @@ int analysisB2019()
 	TCanvas* c5 = new TCanvas("c5","Canvas 5 - behavior of the Pion",1200,600);
 	c5->Divide(2,2);
 	c5->cd(1);
-	Trkpipt_Histo->SetLineColor(kBlue);
+	//Trkpipt_Histo->SetLineColor(kBlue);
 	Trkpipt_Histo->SetMarkerStyle(7);
-	Trkpipt_Histo->SetMarkerStyle(21);
+	//Trkpipt_Histo->SetMarkerStyle(21);
 	//Trkpipt_Histo->SetStats(0);
-	Trkpipt_Histo->SetMarkerColor(kBlue);
-	Trkpipt_Histo->SetFillColor(kBlue);
+	//Trkpipt_Histo->SetMarkerColor(kBlue);
+	//Trkpipt_Histo->SetFillColor(kBlue);
 	Trkpipt_Histo->Draw("HIST");
 	//TrkSpt_Histo->Draw("e1pSAME");
 	TLegend* leg_Trkpipt = new TLegend(0.82,0.5,0.95,0.65);
@@ -774,12 +774,12 @@ int analysisB2019()
 	leg_Trkpipt->Draw();
 	//-------------------------------------------------------------------------
 	c5->cd(2);
-	Trkpinhits_Histo->SetLineColor(kBlue);
+	//Trkpinhits_Histo->SetLineColor(kBlue);
 	Trkpinhits_Histo->SetMarkerStyle(7);
-	Trkpinhits_Histo->SetMarkerStyle(21);
+	//Trkpinhits_Histo->SetMarkerStyle(21);
 	//TrkSnhits_Histo->SetStats(0);
-	Trkpinhits_Histo->SetMarkerColor(kBlue);
-	Trkpinhits_Histo->SetFillColor(kBlue);
+	//Trkpinhits_Histo->SetMarkerColor(kBlue);
+	//Trkpinhits_Histo->SetFillColor(kBlue);
 	Trkpinhits_Histo->Draw("HIST");
 	//Trkpinhits_Histo->Draw("e1pSAME");
 	TLegend* leg_Trkpinhits = new TLegend(0.82,0.5,0.95,0.65);
@@ -791,12 +791,12 @@ int analysisB2019()
 	leg_Trkpinhits->Draw();
 	//-------------------------------------------------------------------------
 	c5->cd(3);
-	Trkpidxy_Histo->SetLineColor(kBlue);
+	//Trkpidxy_Histo->SetLineColor(kBlue);
 	Trkpidxy_Histo->SetMarkerStyle(7);
-	Trkpidxy_Histo->SetMarkerStyle(21);
+	//Trkpidxy_Histo->SetMarkerStyle(21);
 	//Trkpidxy_Histo->SetStats(0);
-	Trkpidxy_Histo->SetMarkerColor(kBlue);
-	Trkpidxy_Histo->SetFillColor(kBlue);
+	//Trkpidxy_Histo->SetMarkerColor(kBlue);
+	//Trkpidxy_Histo->SetFillColor(kBlue);
 	Trkpidxy_Histo->Draw("HIST");
 	//Trkpidxy_Histo->Draw("e1pSAME");
 	TLegend* leg_Trkpidxy = new TLegend(0.82,0.5,0.95,0.65);
@@ -808,12 +808,12 @@ int analysisB2019()
 	leg_Trkpidxy->Draw();
 	//-------------------------------------------------------------------------
 	c5->cd(4);
-	Trkpidz_Histo->SetLineColor(kBlue);
+	//Trkpidz_Histo->SetLineColor(kBlue);
 	Trkpidz_Histo->SetMarkerStyle(7);
-	Trkpidz_Histo->SetMarkerStyle(21);
+	//Trkpidz_Histo->SetMarkerStyle(21);
 	//Trkpidz_Histo->SetStats(0);
-	Trkpidz_Histo->SetMarkerColor(kBlue);
-	Trkpidz_Histo->SetFillColor(kBlue);
+	//Trkpidz_Histo->SetMarkerColor(kBlue);
+	//Trkpidz_Histo->SetFillColor(kBlue);
 	Trkpidz_Histo->Draw("HIST");
 	//Trkpidz_Histo->Draw("e1pSAME");
 	TLegend* leg_Trkpidz = new TLegend(0.82,0.5,0.95,0.65);
@@ -829,12 +829,12 @@ int analysisB2019()
 	TCanvas* c6 = new TCanvas("c6","Canvas 6 - behavior of the Pion",1200,600);
 	c6->Divide(2,2);
 	c6->cd(1);
-	Trkpieta_Histo->SetLineColor(kBlue);
+	//Trkpieta_Histo->SetLineColor(kBlue);
 	Trkpieta_Histo->SetMarkerStyle(7);
-	Trkpieta_Histo->SetMarkerStyle(21);
+	//Trkpieta_Histo->SetMarkerStyle(21);
 	//Trkpieta_Histo->SetStats(0);
-	Trkpieta_Histo->SetMarkerColor(kBlue);
-	Trkpieta_Histo->SetFillColor(kBlue);
+	//Trkpieta_Histo->SetMarkerColor(kBlue);
+	//Trkpieta_Histo->SetFillColor(kBlue);
 	Trkpieta_Histo->Draw("HIST");
 	//Trkpieta_Histo->Draw("e1pSAME");
 	TLegend* leg_Trkpieta = new TLegend(0.82,0.5,0.95,0.65);
@@ -846,12 +846,12 @@ int analysisB2019()
 	leg_Trkpieta->Draw();
 	//-------------------------------------------------------------------------
 	c6->cd(2);
-	Trkpiphi_Histo->SetLineColor(kBlue);
+	//Trkpiphi_Histo->SetLineColor(kBlue);
 	Trkpiphi_Histo->SetMarkerStyle(7);
-	Trkpiphi_Histo->SetMarkerStyle(21);
+	//Trkpiphi_Histo->SetMarkerStyle(21);
 	//TrkTrkpiphiSphi_Histo->SetStats(0);
-	Trkpiphi_Histo->SetMarkerColor(kBlue);
-	Trkpiphi_Histo->SetFillColor(kBlue);
+	//Trkpiphi_Histo->SetMarkerColor(kBlue);
+	//Trkpiphi_Histo->SetFillColor(kBlue);
 	Trkpiphi_Histo->Draw("HIST");
 	//Trkpiphi_Histo->Draw("e1pSAME");
 	TLegend* leg_Trkpiphi = new TLegend(0.82,0.5,0.95,0.65);
@@ -863,12 +863,12 @@ int analysisB2019()
 	leg_Trkpiphi->Draw();
 	//-------------------------------------------------------------------------
 	c6->cd(3);
-	Trkpichi2_Histo->SetLineColor(kBlue);
+	//Trkpichi2_Histo->SetLineColor(kBlue);
 	Trkpichi2_Histo->SetMarkerStyle(7);
-	Trkpichi2_Histo->SetMarkerStyle(21);
+	//Trkpichi2_Histo->SetMarkerStyle(21);
 	//TrkTrkpichi2Sphi_Histo->SetStats(0);
-	Trkpichi2_Histo->SetMarkerColor(kBlue);
-	Trkpichi2_Histo->SetFillColor(kBlue);
+	//Trkpichi2_Histo->SetMarkerColor(kBlue);
+	//Trkpichi2_Histo->SetFillColor(kBlue);
 	Trkpichi2_Histo->Draw("HIST");
 	//Trkpichi2_Histo->Draw("e1pSAME");
 	TLegend* leg_Trkpichi2 = new TLegend(0.82,0.5,0.95,0.65);
@@ -884,12 +884,12 @@ int analysisB2019()
 	TCanvas* c7 = new TCanvas("c7","Canvas 7 - behavior of the Kaon",1200,600);
 	c7->Divide(2,2);
 	c7->cd(1);
-	TrkKpt_Histo->SetLineColor(kBlue);
+	//TrkKpt_Histo->SetLineColor(kBlue);
 	TrkKpt_Histo->SetMarkerStyle(7);
-	TrkKpt_Histo->SetMarkerStyle(21);
+	//TrkKpt_Histo->SetMarkerStyle(21);
 	//TrkKpt_Histo->SetStats(0);
-	TrkKpt_Histo->SetMarkerColor(kBlue);
-	TrkKpt_Histo->SetFillColor(kBlue);
+	//TrkKpt_Histo->SetMarkerColor(kBlue);
+	//TrkKpt_Histo->SetFillColor(kBlue);
 	TrkKpt_Histo->Draw("HIST");
 	//TrkSpt_Histo->Draw("e1pSAME");
 	TLegend* leg_TrkKpt = new TLegend(0.82,0.5,0.95,0.65);
@@ -901,12 +901,12 @@ int analysisB2019()
 	leg_TrkKpt->Draw();
 	//-------------------------------------------------------------------------
 	c7->cd(2);
-	TrkKnhits_Histo->SetLineColor(kBlue);
+	//TrkKnhits_Histo->SetLineColor(kBlue);
 	TrkKnhits_Histo->SetMarkerStyle(7);
-	TrkKnhits_Histo->SetMarkerStyle(21);
+	//TrkKnhits_Histo->SetMarkerStyle(21);
 	//TrkSnhits_Histo->SetStats(0);
-	TrkKnhits_Histo->SetMarkerColor(kBlue);
-	TrkKnhits_Histo->SetFillColor(kBlue);
+	//TrkKnhits_Histo->SetMarkerColor(kBlue);
+	//TrkKnhits_Histo->SetFillColor(kBlue);
 	TrkKnhits_Histo->Draw("HIST");
 	//TrkKnhits_Histo->Draw("e1pSAME");
 	TLegend* leg_TrkKnhits = new TLegend(0.82,0.5,0.95,0.65);
@@ -918,12 +918,12 @@ int analysisB2019()
 	leg_TrkKnhits->Draw();
 	//-------------------------------------------------------------------------
 	c7->cd(3);
-	TrkKdxy_Histo->SetLineColor(kBlue);
+	//TrkKdxy_Histo->SetLineColor(kBlue);
 	TrkKdxy_Histo->SetMarkerStyle(7);
-	TrkKdxy_Histo->SetMarkerStyle(21);
+	//TrkKdxy_Histo->SetMarkerStyle(21);
 	//TrkKdxy_Histo->SetStats(0);
-	TrkKdxy_Histo->SetMarkerColor(kBlue);
-	TrkKdxy_Histo->SetFillColor(kBlue);
+	//TrkKdxy_Histo->SetMarkerColor(kBlue);
+	//TrkKdxy_Histo->SetFillColor(kBlue);
 	TrkKdxy_Histo->Draw("HIST");
 	//TrkKdxy_Histo->Draw("e1pSAME");
 	TLegend* leg_TrkKdxy = new TLegend(0.82,0.5,0.95,0.65);
@@ -935,12 +935,12 @@ int analysisB2019()
 	leg_TrkKdxy->Draw();
 	//-------------------------------------------------------------------------
 	c7->cd(4);
-	TrkKdz_Histo->SetLineColor(kBlue);
+	//TrkKdz_Histo->SetLineColor(kBlue);
 	TrkKdz_Histo->SetMarkerStyle(7);
-	TrkKdz_Histo->SetMarkerStyle(21);
+	//TrkKdz_Histo->SetMarkerStyle(21);
 	//TrkKdz_Histo->SetStats(0);
-	TrkKdz_Histo->SetMarkerColor(kBlue);
-	TrkKdz_Histo->SetFillColor(kBlue);
+	//TrkKdz_Histo->SetMarkerColor(kBlue);
+	//TrkKdz_Histo->SetFillColor(kBlue);
 	TrkKdz_Histo->Draw("HIST");
 	//TrkKdz_Histo->Draw("e1pSAME");
 	TLegend* leg_TrkKdz = new TLegend(0.82,0.5,0.95,0.65);
@@ -956,12 +956,12 @@ int analysisB2019()
 	TCanvas* c8 = new TCanvas("c8","Canvas 8 - behavior of the Kaon",1200,600);
 	c8->Divide(2,2);
 	c8->cd(1);
-	TrkKeta_Histo->SetLineColor(kBlue);
+	//TrkKeta_Histo->SetLineColor(kBlue);
 	TrkKeta_Histo->SetMarkerStyle(7);
-	TrkKeta_Histo->SetMarkerStyle(21);
+	//TrkKeta_Histo->SetMarkerStyle(21);
 	//TrkKeta_Histo->SetStats(0);
-	TrkKeta_Histo->SetMarkerColor(kBlue);
-	TrkKeta_Histo->SetFillColor(kBlue);
+	//TrkKeta_Histo->SetMarkerColor(kBlue);
+	//TrkKeta_Histo->SetFillColor(kBlue);
 	TrkKeta_Histo->Draw("HIST");
 	//TrkKeta_Histo->Draw("e1pSAME");
 	TLegend* leg_TrkKeta = new TLegend(0.82,0.5,0.95,0.65);
@@ -973,12 +973,12 @@ int analysisB2019()
 	leg_TrkKeta->Draw();
 	//-------------------------------------------------------------------------
 	c8->cd(2);
-	TrkKphi_Histo->SetLineColor(kBlue);
+	//TrkKphi_Histo->SetLineColor(kBlue);
 	TrkKphi_Histo->SetMarkerStyle(7);
-	TrkKphi_Histo->SetMarkerStyle(21);
+	//TrkKphi_Histo->SetMarkerStyle(21);
 	//TrkTrkKphiSphi_Histo->SetStats(0);
-	TrkKphi_Histo->SetMarkerColor(kBlue);
-	TrkKphi_Histo->SetFillColor(kBlue);
+	//TrkKphi_Histo->SetMarkerColor(kBlue);
+	//TrkKphi_Histo->SetFillColor(kBlue);
 	TrkKphi_Histo->Draw("HIST");
 	//TrkKphi_Histo->Draw("e1pSAME");
 	TLegend* leg_TrkKphi = new TLegend(0.82,0.5,0.95,0.65);
@@ -990,12 +990,12 @@ int analysisB2019()
 	leg_TrkKphi->Draw();
 	//-------------------------------------------------------------------------
 	c8->cd(3);
-	TrkKchi2_Histo->SetLineColor(kBlue);
+	//TrkKchi2_Histo->SetLineColor(kBlue);
 	TrkKchi2_Histo->SetMarkerStyle(7);
-	TrkKchi2_Histo->SetMarkerStyle(21);
+	//TrkKchi2_Histo->SetMarkerStyle(21);
 	//TrkTrkKchi2Sphi_Histo->SetStats(0);
-	TrkKchi2_Histo->SetMarkerColor(kBlue);
-	TrkKchi2_Histo->SetFillColor(kBlue);
+	//TrkKchi2_Histo->SetMarkerColor(kBlue);
+	//TrkKchi2_Histo->SetFillColor(kBlue);
 	TrkKchi2_Histo->Draw("HIST");
 	//TrkKchi2_Histo->Draw("e1pSAME");
 	TLegend* leg_TrkKchi2 = new TLegend(0.82,0.5,0.95,0.65);

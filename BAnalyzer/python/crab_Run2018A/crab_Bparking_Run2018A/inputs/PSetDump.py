@@ -3,7 +3,7 @@ import FWCore.ParameterSet.Config as cms
 process = cms.Process("analysis")
 
 process.source = cms.Source("PoolSource",
-    fileNames = cms.untracked.vstring('file:129EAF02-B85A-E811-AC4E-0CC47A1DF818.root')
+    fileNames = cms.untracked.vstring('file:EA334703-C759-E811-B440-008CFAE45030.root')
 )
 process.AnomalousCellParameters = cms.PSet(
     maxBadEcalCells = cms.uint32(9999999),
