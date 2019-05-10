@@ -240,7 +240,7 @@ void DstarD0TTree::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
         { 
             if(!iTrack1->hasTrackDetails()) continue;
             if(iTrack1->charge()==0) continue;
-            if(fabs(iTrack1->eta())>2.1) continue; //All the mesons were reconstructed in the pseudorapidity range |eta|<2.1
+            if(fabs(iTrack1->eta())>2.4) continue; //All the mesons were reconstructed in the pseudorapidity range |eta|<2.1
             if(!(iTrack1->trackHighPurity())) continue;
             if(iTrack1->pt()>0.3) //Transverse Momentum
             {
@@ -311,12 +311,12 @@ void DstarD0TTree::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 		PVz = RecVtx.z();
 		PVerrx=RecVtx.xError();
 		PVerry=RecVtx.yError();
-    	PVerrz=RecVtx.zError();
+    	      PVerrz=RecVtx.zError();
 
 
 		RecDstar(iEvent,iSetup,RecVtx); //Reconstruction of D*
 		RecD0(iEvent,iSetup,RecVtx);    //Reconstruction of prompt D0
-		//FindAngle(RecVtx,v_D0,d0kpi_p4); //Calculates the opening angle
+		FindAngle(RecVtx,v_D0,d0kpi_p4); //Calculates the opening angle
 		//GenDstarInfo(iEvent,iSetup); //Stores information from D0 and its products.
 		//GenD0Info(iEvent,iSetup); //Stores information from D0 and its products.
 		//      FindAngleMCpromptD0(p);
@@ -384,7 +384,7 @@ void DstarD0TTree::RecDstar(const edm::Event& iEvent, const edm::EventSetup& iSe
 				math::XYZVector DS_p = D0fromDstar_p + trkS.track().momentum();
 				if(sqrt(DS_p.perp2())<4.) continue;
 
-                // cout << "sqrt(DS_p.perp2()): "<< sqrt(DS_p.perp2()) <<endl;
+                        // cout << "sqrt(DS_p.perp2()): "<< sqrt(DS_p.perp2()) <<endl;
 				TransientTrack K;
 				TransientTrack pi;
                                 
@@ -405,6 +405,7 @@ void DstarD0TTree::RecDstar(const edm::Event& iEvent, const edm::EventSetup& iSe
 				math::XYZTLorentzVector ip4_pi(pi.track().px(),pi.track().py(),pi.track().pz(),sqrt(pow(pi.track().p(),2)+pow(pi_mass,2)));        
 				math::XYZTLorentzVector ip4_D0 = ip4_K + ip4_pi;
 
+                        //
 				if( fabs(ip4_D0.M()-1.86484)  > 1.) continue;
 
 				//SlowPion 4-momentum Reconstruction
@@ -424,7 +425,15 @@ void DstarD0TTree::RecDstar(const edm::Event& iEvent, const edm::EventSetup& iSe
 				if(!v.isValid() || !v.hasRefittedTracks()) continue;
 				double vtxProb =TMath::Prob( (Double_t) v.totalChiSquared(), (Int_t) v.degreesOfFreedom());
 				TransientTrack K_f = v.refittedTrack(K);
-				TransientTrack pi_f = v.refittedTrack(pi);      
+				TransientTrack pi_f = v.refittedTrack(pi);
+
+                        //D* 4-momentum Reconstruction after KalmanVertexFitter
+				math::XYZTLorentzVector p4_K(K_f.track().px(),K_f.track().py(),K_f.track().pz(),sqrt(pow(K_f.track().p(),2)+pow(k_mass,2)));
+				math::XYZTLorentzVector p4_pi(pi_f.track().px(),pi_f.track().py(),pi_f.track().pz(),sqrt(pow(pi_f.track().p(),2)+pow(pi_mass,2)));
+				math::XYZTLorentzVector d0_p4 = p4_K + p4_pi;
+				double d0mass = d0_p4.M();
+
+                        double anglephi = FindAngle(RecVtx,v,d0_p4);
 
 				//D0 from D* Siginificance
 				VertexDistanceXY vD0fromDSdXY ;
@@ -438,26 +447,28 @@ void DstarD0TTree::RecDstar(const edm::Event& iEvent, const edm::EventSetup& iSe
 				double D0fromDSe3D = vD0Kpid3D.distance(RecVtx,v).error() ;
 				double D0fromDSs3D = D0fromDSd3D / D0fromDSe3D;
 				//cout << "significance 3D: "<< D0fromDSs3D << endl;
-
+	
 				if( D0fromDSs3D < 3 ) continue; //significance 3D cut
-
-				//D* 4-momentum Reconstruction after KalmanVertexFitter
-				math::XYZTLorentzVector p4_K(K_f.track().px(),K_f.track().py(),K_f.track().pz(),sqrt(pow(K_f.track().p(),2)+pow(k_mass,2)));
-				math::XYZTLorentzVector p4_pi(pi_f.track().px(),pi_f.track().py(),pi_f.track().pz(),sqrt(pow(pi_f.track().p(),2)+pow(pi_mass,2)));
-				math::XYZTLorentzVector d0_p4 = p4_K + p4_pi;
-				double d0mass = d0_p4.M();				
-
+								
 				math::XYZTLorentzVector dS_p4 = d0_p4 + p4_S;
 				double dsmass = dS_p4.M();
 
-				//Difference between D* and D0
-				if( (dsmass - d0mass) > 0.16) continue; 
+				//Difference between D* and D0 -> Must be close to pion
+				if( (dsmass - d0mass) > 0.16) continue;
+
+                        //Difference between D* and D*PDG
+                        if( fabs(dsmass - 2.01026) > 0.023 && (d0_p4.Perp2()) < 3. ) continue; 
+                        
 				DsCandidates++; //Number of D* candidates
 
-				if(fabs(d0mass - 1.86484)>0.2) continue;
+                        //Difference between D0 and D0PDG
+				if(fabs(d0mass - 1.86484)>0.1) continue;
 
 				if( D0fromDSs3D < 5 ) continue; //significance 3D cut
+                        
 				D0Candidates++; //Number of D0 candidates
+
+                        //double anglePhi = 
 				
 				D0_VtxProb.push_back(vtxProb);
 				D0mass.push_back(d0_p4.M());
