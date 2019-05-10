@@ -435,6 +435,8 @@ void DstarD0TTree::RecDstar(const edm::Event& iEvent, const edm::EventSetup& iSe
 
                         double anglephi = FindAngle(RecVtx,v,d0_p4);
 
+                        if( anglephi < 0.99 ) continue;
+
 				//D0 from D* Siginificance
 				VertexDistanceXY vD0fromDSdXY ;
 				double D0fromDSdXY = vD0fromDSdXY.distance(RecVtx,v).value() ;
