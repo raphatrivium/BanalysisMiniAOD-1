@@ -168,6 +168,13 @@ class DstarD0TTree : public edm::EDAnalyzer {
 		int nHFPlus;
 		int nHFMinus;
 
+		//counters
+		int TotalTracks, TracksAfterTrigger, TracksHasTrackDetails, TracksChargeZero, TracksEta, TracksHighPurity, TracksPDG211;
+		int TracksPtZeroFive, TracksChi3, TracksNumberOfHits2, TracksDxyThree, TracksDzThree, TrackSlowPionCandidates;
+		int TracksPtZeroSix, TracksChiTwoFive, TracksNumberOfHits5, TracksNumberOfPixelHits2, TracksDxyZeroOne, TracksDzOne; 
+		int TrackKaonPionCandidates, D0AfterLorentzVector, D0MinusPDGOne, DsMinusD0Zerothree, PointingcosPhi, Significance, D0pTThree;
+		int DsAfterLorentzVector, DsMinusPDG, DsMinusD0;
+
 		int counter,runNumber,eventNumber,lumi;
 
         int countInTriggered;
@@ -191,6 +198,7 @@ class DstarD0TTree : public edm::EDAnalyzer {
 		std::vector<double> D0_VtxProb,D0pt,Dspt,D0eta,Dseta,D0phi,Dsphi,D0_VtxPosx,D0_VtxPosy,D0_VtxPosz,D0_Vtxerrx,D0_Vtxerry,D0_Vtxerrz,TrkKdxy;
 		std::vector<double> Dsmass,Trkpidxy,TrkSdxy,TrkKdz,Trkpidz,TrkSdz,TrkKnhits,Trkpinhits,TrkSnhits,TrkKchi2,Trkpichi2,TrkSchi2,DSDeltaR,TrkKpt,Trkpipt;
 		std::vector<double> D0mass,TrkKmass,Trkpimass,TrkSmass,TrkSpt,TrkKeta,Trkpieta,TrkSeta,TrkKphi,Trkpiphi,TrkSphi,TrkScharge,D0fromDSsXY_vec;
+		std::vector<double> D0fromDSs3D_vec, Anglephi_vec;
 
 		std::vector<double> MxFromPFCands_,EPlusPzFromPFCands_,EMinusPzFromPFCands_,sumEHFPlusFromPFCands_,sumEHFMinusFromPFCands_;
 		std::vector<double> xiPlusFromPFCands_,xiMinusFromPFCands_,etaMaxFromPFCands_,etaMinFromPFCands_;
