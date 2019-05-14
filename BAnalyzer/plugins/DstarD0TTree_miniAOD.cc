@@ -452,8 +452,9 @@ void DstarD0TTree::RecDstar(const edm::Event& iEvent, const edm::EventSetup& iSe
 				double d0mass = d0_p4.M();
 
   				double anglephi = FindAngle(RecVtx,v,d0_p4);
-				if( fabs(anglephi) < 0.99 ) continue;
-				//cout << "anglephi: " << anglephi << endl;
+				double cosPhi =  cos(anglephi);
+				if( cosPhi < 0.99 ) continue;
+				//cout << "cos(anglephi)	: " << cos(anglephi) << endl;
 				PointingcosPhi++;
 
 				//D0 from D* Siginificance
@@ -548,7 +549,7 @@ void DstarD0TTree::RecDstar(const edm::Event& iEvent, const edm::EventSetup& iSe
 
 				D0fromDSs3D_vec.push_back(D0fromDSs3D);
 				D0fromDSsXY_vec.push_back(D0fromDSsXY);
-				Anglephi_vec.push_back(anglephi);   
+				Anglephi_vec.push_back(cosPhi);   
                                
 				NKpiCand++;  
 									
