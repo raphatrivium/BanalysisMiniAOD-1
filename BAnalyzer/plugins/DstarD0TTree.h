@@ -160,7 +160,7 @@ class DstarD0TTree : public edm::EDAnalyzer {
 		double comEnergy_;
 		int TTBit_8,TTBit_9,TTBit_10,TTBit_32,TTBit_33,TTBit_34; 
 
-		int Total_Events = 0;
+		int Total_Events;
 
 		bool signalpf;      
 
@@ -172,8 +172,8 @@ class DstarD0TTree : public edm::EDAnalyzer {
 		int TotalTracks, TracksAfterTrigger, TracksHasTrackDetails, TracksChargeZero, TracksEta, TracksHighPurity, TracksPDG211;
 		int TracksPtZeroFive, TracksChi3, TracksNumberOfHits2, TracksDxyThree, TracksDzThree, TrackSlowPionCandidates;
 		int TracksPtZeroSix, TracksChiTwoFive, TracksNumberOfHits5, TracksNumberOfPixelHits2, TracksDxyZeroOne, TracksDzOne; 
-		int TrackKaonPionCandidates, D0AfterLorentzVector, DsMinusD0Zerothree, TransientTrackOfpiK, PointingcosPhi, Significance, D0MinusPDG;
-		int D0pTThree, DsAfterLorentzVector, DsMinusD0, Observation;
+		int TrackKaonPionCandidates, D0AfterLorentzVector, DsMinusD0Zerothree, TransientTrackOfpiK, D0AfterLorentzVectorKarman;
+		int PointingcosPhi, Significance, D0MinusPDG, D0pTThree, DsAfterLorentzVector, DsMinusD0, Observation;
 
 		int counter,runNumber,eventNumber,lumi;
 

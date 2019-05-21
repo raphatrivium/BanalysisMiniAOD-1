@@ -239,63 +239,65 @@ void DstarD0TTree::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
         if (triggerFired) 
         { 	TracksAfterTrigger++;
             if(!iTrack1->hasTrackDetails()) continue;
-			TracksHasTrackDetails++;
+            TracksHasTrackDetails++;
             if(iTrack1->charge()==0) continue;
-			TracksChargeZero++;
+            TracksChargeZero++;
             if(fabs(iTrack1->eta())>2.4) continue; //All the mesons were reconstructed in the pseudorapidity range |eta|<2.1
-			TracksEta++;
+            TracksEta++;
             if(!(iTrack1->trackHighPurity())) continue;
-			TracksHighPurity++;
-			if(fabs(iTrack1->pdgId()) != 211 ) continue;
-			TracksPDG211++;
-			//Selection for slowpion from D* (The note is 0.5 but the MiniAOD works with pt > 0.5
-            if( iTrack1->pt()>0.5 )
+            TracksHighPurity++;
+            //if(fabs(iTrack1->pdgId()) != 211 ) continue;
+            //TracksPDG211++;
+
+            //Selection for slowpion from D* (The note is 0.5 but the MiniAOD works with pt > 0.5
+            if( iTrack1->pt()>0.3 )
             {
-				TracksPtZeroFive++;
-				if(iTrack1->pseudoTrack().normalizedChi2() > 3.) continue;
-				TracksChi3++;
-				//if(iTrack1->pseudoTrack().hitPattern().numberOfValidHits() < 2) continue;
-				if(iTrack1->numberOfHits() < 3) continue; // > and = 2
-				TracksNumberOfHits2++;
-				if(fabs(iTrack1->dxy())>3.) continue;
-				TracksDxyThree++;
-				if(fabs(iTrack1->dz())>3.) continue;
-				TracksDzThree++;
-				reco::TransientTrack slowpionTT = theB->build(iTrack1->pseudoTrack());
-				TrackSlowPionCandidates++; 
-				slowPiTracks.push_back(slowpionTT);	//Fill Transient Vector
-		    }
+                  TracksPtZeroFive++;
+                  if(iTrack1->pseudoTrack().normalizedChi2() > 3.) continue;
+                  TracksChi3++;
+                  //if(iTrack1->pseudoTrack().hitPattern().numberOfValidHits() < 2) continue;
+                  if(iTrack1->numberOfHits() < 2) continue; // > and = 2
+                  TracksNumberOfHits2++;
+                  if(fabs(iTrack1->dxy())>3.) continue;
+                  TracksDxyThree++;
+                  if(fabs(iTrack1->dz())>3.) continue;
+                  TracksDzThree++;
+                  reco::TransientTrack slowpionTT = theB->build(iTrack1->pseudoTrack());
+                  TrackSlowPionCandidates++; 
+                  slowPiTracks.push_back(slowpionTT);	//Fill Transient Vector
+            }
 			
-			Observation++;
-			//Kaon and Pion Candidates
-			if( iTrack1->pt()>0.5 /*&& (fabs(iTrack1->pdgId()) == 211)*/)
-			{
-			   	TracksPtZeroSix++;
-				if(iTrack1->pseudoTrack().normalizedChi2() > 2.5) continue;
-				TracksChiTwoFive++;
-				//if(iTrack1->pseudoTrack().hitPattern().numberOfValidHits() < 5) continue;
-				//if(iTrack1->pseudoTrack().hitPattern().numberOfValidPixelHits() < 2) continue;
-				if(iTrack1->numberOfHits() < 5) continue;
-				TracksNumberOfHits5++;
-				if(iTrack1->numberOfPixelHits() < 2) continue;
-				TracksNumberOfPixelHits2++;				
-				if(fabs(iTrack1->dxy()) > 0.1) continue;
-				TracksDxyZeroOne++;	
-				if(fabs(iTrack1->dz())>1.) continue;
-				TracksDzOne++;
-				reco::TransientTrack  PionTT = theB->build(iTrack1->pseudoTrack());
-				if (debug)cout << " PionTT "  << PionTT.track().momentum() << endl;
-				TrackKaonPionCandidates++;
-				goodTracks.push_back(PionTT); //Fill Transient Vector
+		Observation++;
+		//Kaon and Pion Candidates
+		if( iTrack1->pt()>0.5 /*&& (fabs(iTrack1->pdgId()) == 211)*/)
+		{
+                  TracksPtZeroSix++;
+                  if(iTrack1->pseudoTrack().normalizedChi2() > 2.5) continue;
+                  TracksChiTwoFive++;
+                  //if(iTrack1->pseudoTrack().hitPattern().numberOfValidHits() < 5) continue;
+                  //if(iTrack1->pseudoTrack().hitPattern().numberOfValidPixelHits() < 2) continue;
+                  if(iTrack1->numberOfHits() < 5) continue;
+                  TracksNumberOfHits5++;
+                  if(iTrack1->numberOfPixelHits() < 2) continue;
+                  TracksNumberOfPixelHits2++;				
+                  if(fabs(iTrack1->dxy()) > 0.1) continue;
+                  TracksDxyZeroOne++;	
+                  if(fabs(iTrack1->dz())>1.) continue;
+                  TracksDzOne++;
+                  reco::TransientTrack  PionTT = theB->build(iTrack1->pseudoTrack());
+                  if (debug)cout << " PionTT "  << PionTT.track().momentum() << endl;
+                  TrackKaonPionCandidates++;
+                  goodTracks.push_back(PionTT); //Fill Transient Vector
 	    	}
-			// SELECTING TRACKS FOR D0             
-			if(fabs(iTrack1->eta())<2.5 && iTrack1->pseudoTrack().normalizedChi2() < 5.0 && iTrack1->pseudoTrack().hitPattern().numberOfValidHits() >= 5 && iTrack1->pseudoTrack().hitPattern().numberOfValidPixelHits() >= 2 && iTrack1->pt() > 0.5 && iTrack1->p() >1.0 && fabs(iTrack1->dz())<0.5 && fabs(iTrack1->dxy())<0.1)
+
+            // SELECTING TRACKS FOR D0             
+		if(fabs(iTrack1->eta())<2.5 && iTrack1->pseudoTrack().normalizedChi2() < 5.0 && iTrack1->pseudoTrack().hitPattern().numberOfValidHits() >= 5 && iTrack1->pseudoTrack().hitPattern().numberOfValidPixelHits() >= 2 && iTrack1->pt() > 0.5 && iTrack1->p() >1.0 && fabs(iTrack1->dz())<0.5 && fabs(iTrack1->dxy())<0.1)
         	{
-				reco::TransientTrack  D0TT = theB->build(iTrack1->pseudoTrack());
-				//goodTracksD0.push_back(D0TT);
-			}
-     	}//trigger
-   	}//loop packed candidates
+                  reco::TransientTrack  D0TT = theB->build(iTrack1->pseudoTrack());
+                  //goodTracksD0.push_back(D0TT);
+            }
+     	 }//trigger
+   }//loop packed candidates
 //}//trigger
 
     if (debug) cout << " goodTracks size " << goodTracks.size() << endl;
@@ -305,35 +307,35 @@ void DstarD0TTree::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     if(triggerFired)
     {
         size_t vtx_trk_size = (*recVtxs)[0].tracksSize();
-	    int VtxIn=0;
-	    for(size_t i = 0; i < recVtxs->size(); ++ i)
-	    {
-	        const Vertex &vtx = (*recVtxs)[i];
-	        if(vtx.tracksSize()>vtx_trk_size)
-	        {
-                VtxIn = i;
-                vtx_trk_size = vtx.tracksSize();
-	        }
-	    }
+	  int VtxIn=0;
+	  for(size_t i = 0; i < recVtxs->size(); ++ i)
+	  {
+            const Vertex &vtx = (*recVtxs)[i];
+            if(vtx.tracksSize()>vtx_trk_size)
+            {
+                  VtxIn = i;
+                  vtx_trk_size = vtx.tracksSize();
+            }
+       }
 
     	const Vertex& RecVtx = (*recVtxs)[VtxIn];
 
-		n_pVertex = recVtxs->size();
+      n_pVertex = recVtxs->size();
 
-		PVx = RecVtx.x();
-		PVy = RecVtx.y();
-		PVz = RecVtx.z();
-		PVerrx=RecVtx.xError();
-		PVerry=RecVtx.yError();
-		PVerrz=RecVtx.zError();
+      PVx = RecVtx.x();
+      PVy = RecVtx.y();
+      PVz = RecVtx.z();
+      PVerrx=RecVtx.xError();
+      PVerry=RecVtx.yError();
+      PVerrz=RecVtx.zError();
 
-		//Calling Secondary Functions
-		RecDstar(iEvent,iSetup,RecVtx); //Reconstruction of D*
-		//RecD0(iEvent,iSetup,RecVtx);    //Reconstruction of prompt D0
-		//FindAngle(RecVtx,v_D0,d0kpi_p4); //Calculates the opening angle
-		//GenDstarInfo(iEvent,iSetup); //Stores information from D0 and its products.
-		//GenD0Info(iEvent,iSetup); //Stores information from D0 and its products.
-		//      FindAngleMCpromptD0(p);
+      //Calling Secondary Functions
+      RecDstar(iEvent,iSetup,RecVtx); //Reconstruction of D*
+      //RecD0(iEvent,iSetup,RecVtx);    //Reconstruction of prompt D0
+      //FindAngle(RecVtx,v_D0,d0kpi_p4); //Calculates the opening angle
+      //GenDstarInfo(iEvent,iSetup); //Stores information from D0 and its products.
+      //GenD0Info(iEvent,iSetup); //Stores information from D0 and its products.
+      //FindAngleMCpromptD0(p);
 
 		data->Fill();
     }
@@ -368,7 +370,7 @@ void DstarD0TTree::RecDstar(const edm::Event& iEvent, const edm::EventSetup& iSe
     //cout << " RecDstar using goodTracks is " << goodTracks.size() << endl;
 	for(size_t i=0;i<goodTracks.size();i++)
 	{  
-		TransientTrack trk1 = goodTracks[i];
+            TransientTrack trk1 = goodTracks[i];
 
 		for(size_t j=i+1;j<goodTracks.size();j++)
 		{			    
@@ -377,7 +379,7 @@ void DstarD0TTree::RecDstar(const edm::Event& iEvent, const edm::EventSetup& iSe
 
 			if(trk1.charge() == trk2.charge()) continue;
 			//cout<< "OP Charge for two good tracks(px,py,pz)" <<endl;
-            //cout <<   trk1.track().momentum() <<    trk2.track().momentum() << endl;
+                  //cout <<   trk1.track().momentum() <<    trk2.track().momentum() << endl;
 
 			//D0 momentum Reconstruction
 			//math::XYZVector D0fromDstar_p = trk1.track().momentum() + trk2.track().momentum();
@@ -446,6 +448,7 @@ void DstarD0TTree::RecDstar(const edm::Event& iEvent, const edm::EventSetup& iSe
 				math::XYZTLorentzVector p4_pi(pi_f.track().px(),pi_f.track().py(),pi_f.track().pz(),sqrt(pow(pi_f.track().p(),2)+pow(pi_mass,2)));
 				math::XYZTLorentzVector d0_p4 = p4_K + p4_pi;
 				double d0mass = d0_p4.M();
+				D0AfterLorentzVectorKarman++;
 
   				double anglephi = FindAngle(RecVtx,v,d0_p4);
 				double cosPhi =  cos(anglephi);
@@ -468,8 +471,8 @@ void DstarD0TTree::RecDstar(const edm::Event& iEvent, const edm::EventSetup& iSe
 				if( D0fromDSs3D < 3 ) continue; //significance 3D cut
 				Significance++;
 
-				//Difference between D0 and D0PDG
-				if( fabs(d0mass - 1.86484) > 0.023 ) continue;
+				//Difference between D0 and D0PDG 5sigmas
+				if( fabs(d0mass - 1.86484) > 0.1 ) continue;
 				D0MinusPDG++;
 
 				//Pt Cut of mesnons D0
@@ -961,13 +964,14 @@ void DstarD0TTree::initialize(){
 	HFEnergyPlus=0.; HFEnergyMinus=0.;  lumiWeight_=0.;
 
 	//counters
-	TotalTracks = 0; TracksAfterTrigger = 0; TracksHasTrackDetails =0; TracksChargeZero = 0; TracksEta = 0; 
+
+	Total_Events = 0; TotalTracks = 0; TracksAfterTrigger = 0; TracksHasTrackDetails =0; TracksChargeZero = 0; TracksEta = 0; 
 	TracksHighPurity = 0; TracksPDG211 = 0; TracksPtZeroFive = 0; TracksChi3 = 0; TracksNumberOfHits2 = 0; 
 	TracksDxyThree = 0; TracksDzThree = 0; TrackSlowPionCandidates = 0; TracksPtZeroSix = 0; TracksChiTwoFive = 0;
 	TracksNumberOfHits5 = 0; TracksNumberOfPixelHits2 = 0; TracksDxyZeroOne = 0; TracksDzOne = 0; TrackKaonPionCandidates = 0;
 	Observation = 0;
 
-	D0AfterLorentzVector = 0; DsMinusD0Zerothree = 0; TransientTrackOfpiK = 0; PointingcosPhi = 0;
+	D0AfterLorentzVector = 0; DsMinusD0Zerothree = 0; TransientTrackOfpiK = 0; D0AfterLorentzVectorKarman = 0; PointingcosPhi = 0;
 	Significance = 0; D0pTThree = 0; DsAfterLorentzVector = 0; D0MinusPDG = 0; DsMinusD0 = 0;
 
 	signalpf = false;
@@ -1096,6 +1100,7 @@ void DstarD0TTree::beginJob(){
 	data->Branch("D0AfterLorentzVector",&D0AfterLorentzVector,"D0AfterLorentzVector/I");
 	data->Branch("DsMinusD0Zerothree",&DsMinusD0Zerothree,"DsMinusD0Zerothree/I");
 	data->Branch("TransientTrackOfpiK",&TransientTrackOfpiK,"TransientTrackOfpiK/I");
+	data->Branch("D0AfterLorentzVectorKarman",&D0AfterLorentzVectorKarman,"D0AfterLorentzVectorKarman/I");
 	data->Branch("PointingcosPhi",&PointingcosPhi,"PointingcosPhi/I");
 	data->Branch("Significance",&Significance,"Significance/I");
 	data->Branch("D0pTThree",&D0pTThree,"D0pTThree/I");
