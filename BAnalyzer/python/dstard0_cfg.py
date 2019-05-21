@@ -11,7 +11,7 @@ process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condD
 process.GlobalTag.globaltag = "101X_dataRun2_Prompt_v9"
 
 #number of events (-1 -> all)
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(1000))
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1))
 
 process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True),
 IgnoreCompletely = cms.untracked.vstring('ProductNotFound'),
@@ -37,8 +37,18 @@ process.analysis = cms.EDAnalyzer('DstarD0TTree',
     doRec=cms.bool(True),
     bits = cms.InputTag("TriggerResults","","HLT"),
     prescales = cms.InputTag("patTrigger"),
-    #PathName = cms.untracked.string("HLT_Mu9_IP6_part0_v"), #ParkingBPH1
-    PathName = cms.untracked.string("HLT_Mu7_IP4_part0_v"),  #ParkingBPH1
+    #PathName = cms.untracked.string("HLT_Mu12_IP6_part0_v"), #ParkingBPH1 ######
+    #PathName = cms.untracked.string("HLT_Mu7_IP4_part0_v"), #ParkingBPH1  ########
+    #PathName = cms.untracked.string("HLT_Mu8_IP3_part0_v"), #ParkingBPH1  v1
+    #PathName = cms.untracked.string("HLT_Mu8_IP5_part0_v"), #ParkingBPH1 ########
+    #PathName = cms.untracked.string("HLT_Mu8_IP6_part0_v"), #ParkingBPH1 ########
+    #PathName = cms.untracked.string("HLT_Mu9_IP0_part0_v"), #ParkingBPH1 ########
+    #PathName = cms.untracked.string("HLT_Mu9_IP3_part0_v"), #ParkingBPH1 #######
+    #PathName = cms.untracked.string("HLT_Mu9_IP4_part0_v"), #ParkingBPH1 #######
+    #PathName = cms.untracked.string("HLT_Mu9_IP5_part0_v"), #ParkingBPH1 ########
+    #PathName = cms.untracked.string("HLT_Mu9_IP5_part0_v"), #ParkingBPH1 ######## 
+    PathName = cms.untracked.string("HLT_Mu9_IP6_part0_v"),  #ParkingBPH1 ----
+
     tracks = cms.InputTag('packedPFCandidates'),#Minia AOD
     recVtxs = cms.InputTag('offlineSlimmedPrimaryVertices'), #Mini AOD
     genParticles = cms.InputTag('genParticles'),
