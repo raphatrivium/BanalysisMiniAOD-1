@@ -172,8 +172,8 @@ class DstarD0TTree : public edm::EDAnalyzer {
 		int TotalTracks, TracksAfterTrigger, TracksHasTrackDetails, TracksChargeZero, TracksEta, TracksHighPurity, TracksPDG211;
 		int TracksPtZeroFive, TracksChi3, TracksNumberOfHits2, TracksDxyThree, TracksDzThree, TrackSlowPionCandidates;
 		int TracksPtZeroSix, TracksChiTwoFive, TracksNumberOfHits5, TracksNumberOfPixelHits2, TracksDxyZeroOne, TracksDzOne; 
-		int TrackKaonPionCandidates, D0AfterLorentzVector, D0MinusPDGOne, DsMinusD0Zerothree, PointingcosPhi, Significance, D0pTThree;
-		int DsAfterLorentzVector, DsMinusPDG, DsMinusD0;
+		int TrackKaonPionCandidates, D0AfterLorentzVector, DsMinusD0Zerothree, TransientTrackOfpiK, PointingcosPhi, Significance, D0MinusPDG;
+		int D0pTThree, DsAfterLorentzVector, DsMinusD0, Observation;
 
 		int counter,runNumber,eventNumber,lumi;
 
