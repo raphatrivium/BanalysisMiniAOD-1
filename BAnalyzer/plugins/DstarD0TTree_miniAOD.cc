@@ -426,10 +426,16 @@ void DstarD0TTree::RecDstar(const edm::Event& iEvent, const edm::EventSetup& iSe
                 //D* 4-momentum Reconstruction (D0 + SlowPion)
 				math::XYZTLorentzVector ip4_DS = ip4_D0 + p4_S;
 		
+
 				////To descrase statistc to gain speed becaus we have more tight cut below
 				if((ip4_DS.M() - ip4_D0.M()) > 0.3) continue;
  				//cout << "ip4_DS.M() :" << ip4_DS.M() << " ip4_D0.M(): " << ip4_D0.M() << endl;
 				DsMinusD0Zerothree++;
+
+				cout << "------------------------------------- " << endl;
+				cout << "1 Trk S chi2: " << K.track().normalizedChi2() << endl;
+				cout << "1 Trk pi chi2: " << pi.track().normalizedChi2() << endl;
+				cout << "1 Trk K chi2: " << trkS.track().normalizedChi2() << endl;
                                 
 				//KalmanVertexFitter
 				vector<TransientTrack> tks;
@@ -442,6 +448,15 @@ void DstarD0TTree::RecDstar(const edm::Event& iEvent, const edm::EventSetup& iSe
 				TransientTrack K_f = v.refittedTrack(K);
 				TransientTrack pi_f = v.refittedTrack(pi);
 				TransientTrackOfpiK++;
+
+				cout << "2 Trk S chi2: " << trkS.track().normalizedChi2() << endl;
+				cout << "2 Trk pi chi2: " << pi.track().normalizedChi2() << endl;
+				cout << "2 Trk K chi2: " << K.track().normalizedChi2() << endl;
+				cout << "2 Trk pi_f chi2: " << pi_f.track().normalizedChi2() << endl;
+				cout << "2 Trk K_f chi2: " << K_f.track().normalizedChi2() << endl;
+				
+				//SV Confidence Level
+				//if(vtxProb < 0.01) continue;
 				
 				//D* 4-momentum Reconstruction after KalmanVertexFitter
 				math::XYZTLorentzVector p4_K(K_f.track().px(),K_f.track().py(),K_f.track().pz(),sqrt(pow(K_f.track().p(),2)+pow(k_mass,2)));

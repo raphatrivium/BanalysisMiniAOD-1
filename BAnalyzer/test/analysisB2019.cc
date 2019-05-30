@@ -50,17 +50,53 @@ int analysisB2019()
 	//call a file for a histogram style (Optional)
 	gROOT->LoadMacro("styleTDR.C"); 
 	setTDRStyle();
-
-	//counters for file f1 (pythia)
-	int count_Total_Events_pythia = 0;
 	
 	//Lorentz Vector
-	TLorentzVector mu_1;
-	TLorentzVector mu_2;	
-	
-	//Variaveis	and Vectors
-	//int Total_Events = 0;
+	//TLorentzVector mu_1;
+	//TLorentzVector mu_2;
 
+	//To get the counters (variables int)
+	bool Conters = true ;
+	//To get the vector and make histograms
+	bool VectorsHistograms = false ;
+	//It is bind to bool VectorsHistograms. False = Make only Mesons D histograms, True = Make allhistogrmas
+	bool Meson = false;
+
+			
+	//Variables	and Vectors
+	int Total_Events = 0;
+
+	int TotalTracks = 0;
+	int TracksAfterTrigger = 0;
+	int TracksHasTrackDetails = 0;
+	int TracksChargeZero = 0;
+	int TracksHighPurity = 0;
+	int TracksPDG211 = 0;
+	int TracksPtZeroFive = 0;
+	int TracksNumberOfHits2 = 0;
+	int TracksDxyThree = 0;
+	int TracksDzThree = 0;
+	int TrackSlowPionCandidates = 0;
+	int	Observation = 0;
+	int TracksPtZeroSix = 0;
+	int TracksChiTwoFive = 0;
+	int TracksNumberOfHits5 = 0;
+	int TracksNumberOfPixelHits2 = 0;
+	int TracksDzOne = 0;
+	int TracksDxyZeroOne = 0;
+	int TrackKaonPionCandidates = 0;
+
+	int D0AfterLorentzVector = 0;
+	int DsMinusD0Zerothree = 0;
+	int TransientTrackOfpiK = 0;
+	int PointingcosPhi = 0;
+	int Significance = 0;
+	int D0pTThree = 0;
+	int D0Candidates = 0;
+	int DsAfterLorentzVector = 0;
+	int DsMinusD0 = 0;
+	int DsCandidates = 0;
+	
 	std::vector<double>* D0mass = 0.;
 	std::vector<double>* Dsmass = 0.;
 	std::vector<double>* D0_VtxProb = 0.;
@@ -104,6 +140,43 @@ int analysisB2019()
 	std::vector<double>* D0mass = 0.;
 	std::vector<double>* D0mass = 0.;
 
+	
+	std::vector<double> vectorInvariantMass_Dstar = 0.;
+	std::vector<double> vectorInvariantMass_D0 = 0.;
+
+	//counters for file f1 (pythia)
+	int countTotalEvents = 0;
+
+	int countTotalTracks = 0;
+	int countTracksAfterTrigger = 0;
+	int countTracksHasTrackDetails = 0;
+	int countTracksChargeZero = 0;
+	int countTracksHighPurity = 0;
+	int countTracksPDG211 = 0;
+	int countTracksPtZeroFive = 0;
+	int countTracksNumberOfHits2 = 0;
+	int countTracksDxyThree = 0;
+	int countTracksDzThree = 0;
+	int countTrackSlowPionCandidates = 0;
+	int countObservation = 0;
+	int countTracksPtZeroSix = 0;
+	int countTracksChiTwoFive = 0;
+	int countTracksNumberOfHits5 = 0;
+	int countTracksNumberOfPixelHits2 = 0;
+	int countTracksDzOne = 0;
+	int countTracksDxyZeroOne = 0;
+	int countTrackKaonPionCandidates = 0;
+
+	int countD0AfterLorentzVector = 0;
+	int countDsMinusD0Zerothree = 0;
+	int countTransientTrackOfpiK = 0;
+	int countPointingcosPhi = 0;
+	int countSignificance = 0;
+	int countD0pTThree = 0;
+	int countD0Candidates = 0;
+	int countDsAfterLorentzVector = 0;
+	int countDsMinusD0 = 0;
+	int countDsCandidates = 0;
 
 	//double M = 0.;
 	//double Pt = 0.;
@@ -113,8 +186,8 @@ int analysisB2019()
 	//*****Creating Histgrams******************************************************	
 
 	//Histogramas cinematics quantities of the D0
-	TH1F *D0mass_Histo = new TH1F("D0mass_Histo","D0mass_Histo",100,1.5,2.3);
-	D0mass_Histo->SetTitle("Mass distribuition of the D0 ; Mass [GeV] ; Events ");
+	TH1D *D0mass_Histo = new TH1D("D0mass_Histo","D0mass_Histo",100,1.7,2.0);
+	D0mass_Histo->SetTitle("Invariant Mass of the D0 ; Mass [GeV] ; Events ");
 	D0mass_Histo->SetName("D0mass_Histo");
 
 	TH1F *D0eta_Histo = new TH1F("D0eta_Histo","D0eta_Histo",100,-3,3);
@@ -122,12 +195,16 @@ int analysisB2019()
 	D0eta_Histo->SetName("D0eta_Histo");
 
 	TH1F *D0phi_Histo = new TH1F("D0phi_Histo","D0phi_Histo",100,-5,5);
-	D0phi_Histo->SetTitle("#Phi distribuition of the D0 ; #Phi [º] ; Events ");
+	D0phi_Histo->SetTitle("#Phi distribuition of the D0 ; #Phi ; Events ");
 	D0phi_Histo->SetName("D0phi_Histo");
 
+	TH1F *D0pt_Histo = new TH1F("D0pt_Histo","D0pt_Histo",100,0,40);
+	D0pt_Histo->SetTitle("pT distribuition of the D0 ; pT [GeV] ; Events ");
+	D0pt_Histo->SetName("D0pt_Histo");
+
 	//Histogramas cinematics quantities of the D*
-	TH1F *Dsmass_Histo = new TH1F("Dsmass_Histo","Dsmass_Histo",100,1.6,2.4);
-	Dsmass_Histo->SetTitle("Mass distribuition of the D* ; Mass [GeV] ; Events ");
+	TH1D *Dsmass_Histo = new TH1D("Dsmass_Histo","Dsmass_Histo",100,1.85,2.15);
+	Dsmass_Histo->SetTitle("Invariant Mass of the D* ; Mass [GeV] ; Events ");
 	Dsmass_Histo->SetName("Dsmass_Histo");
 
 	TH1F *Dseta_Histo = new TH1F("Dseta_Histo","Dseta_Histo",100,-3,3);
@@ -135,12 +212,16 @@ int analysisB2019()
 	Dseta_Histo->SetName("Dseta_Histo");
 
 	TH1F *Dsphi_Histo = new TH1F("Dsphi_Histo","Dsphi_Histo",100,-5,5);
-	Dsphi_Histo->SetTitle("#Phi distribuition of the D* ; #Phi [º] ; Events ");
+	Dsphi_Histo->SetTitle("#Phi distribuition of the D* ; #Phi ; Events ");
 	Dsphi_Histo->SetName("Dsphi_Histo");
+
+	TH1F *Dspt_Histo = new TH1F("Dspt_Histo","DspT_Histo",100,0,40);
+	Dspt_Histo->SetTitle("pT distribuition of the D* ; pT [GeV] ; Events ");
+	Dspt_Histo->SetName("Dspt_Histo");
 
 	//Histogramas cinematics quantities of the SlowPion
 	TH1F *TrkSpt_Histo = new TH1F("TrkSpt_Histo","TrkSpt_Histo",100,0,2.5);
-	TrkSpt_Histo->SetTitle("pt distribuition of the SlowPion ; Mass [GeV] ; Events ");
+	TrkSpt_Histo->SetTitle("pt distribuition of the SlowPion ; pT [GeV] ; Events ");
 	TrkSpt_Histo->SetName("TrkSpt_Histo");
 
 	TH1F *TrkSnhits_Histo = new TH1F("TrkSnhits_Histo","TrkSnhits_Histo",100,0,45);
@@ -160,7 +241,7 @@ int analysisB2019()
 	TrkSeta_Histo->SetName("TrkSeta_Histo");
 
 	TH1F *TrkSphi_Histo = new TH1F("TrkSphi_Histo","TrkSphi_Histo",100,-4,4);
-	TrkSphi_Histo->SetTitle("Phi distribuition of the SlowPion ; #Phi [º] ; Events ");
+	TrkSphi_Histo->SetTitle("Phi distribuition of the SlowPion ; #Phi ; Events ");
 	TrkSphi_Histo->SetName("TrkSphi_Histo");
 
 	TH1F *TrkSchi2_Histo = new TH1F("TrkSchi2_Histo","TrkSchi2_Histo",10,0,3);
@@ -169,7 +250,7 @@ int analysisB2019()
 
 	//Histogramas cinematics quantities of the Pion
 	TH1F *Trkpipt_Histo = new TH1F("Trkpipt_Histo","Trkpipt_Histo",100,0,10);
-	Trkpipt_Histo->SetTitle("pt distribuition of the Pion ; Mass [GeV] ; Events ");
+	Trkpipt_Histo->SetTitle("pt distribuition of the Pion ; pT [GeV] ; Events ");
 	Trkpipt_Histo->SetName("Trkpipt_Histo");
 
 	TH1F *Trkpinhits_Histo = new TH1F("Trkpinhits_Histo","Trkpinhits_Histo",100,0,40);
@@ -189,7 +270,7 @@ int analysisB2019()
 	Trkpieta_Histo->SetName("Trkpieta_Histo");
 
 	TH1F *Trkpiphi_Histo = new TH1F("Trkpiphi_Histo","Trkpiphi_Histo",100,-4,4);
-	Trkpiphi_Histo->SetTitle("phi distribuition of the SlowPion ; #Phi [º] ; Events ");
+	Trkpiphi_Histo->SetTitle("phi distribuition of the Pion ; #Phi ; Events ");
 	Trkpiphi_Histo->SetName("Trkpiphi_Histo");
 
 	TH1F *Trkpichi2_Histo = new TH1F("Trkpichi2_Histo","Trkpichi2_Histo",10,0,3);
@@ -198,7 +279,7 @@ int analysisB2019()
 
 	//Histogramas cinematics quantities of the Kaon
 	TH1F *TrkKpt_Histo = new TH1F("TrkKpt_Histo","TrkKpt_Histo",100,0,10);
-	TrkKpt_Histo->SetTitle("pt distribuition of the Kaon ; Mass [GeV] ; Events ");
+	TrkKpt_Histo->SetTitle("pt distribuition of the Kaon ; pT [GeV] ; Events ");
 	TrkKpt_Histo->SetName("TrkKpt_Histo");
 
 	TH1F *TrkKnhits_Histo = new TH1F("TrkKnhits_Histo","TrkKnhits_Histo",100,0,40);
@@ -218,7 +299,7 @@ int analysisB2019()
 	TrkKeta_Histo->SetName("TrkKeta_Histo");
 
 	TH1F *TrkKphi_Histo = new TH1F("TrkKphi_Histo","TrkKphi_Histo",100,-4,4);
-	TrkKphi_Histo->SetTitle("phi distribuition of the Kaon ; #Phi [º] ; Events ");
+	TrkKphi_Histo->SetTitle("phi distribuition of the Kaon ; #Phi ; Events ");
 	TrkKphi_Histo->SetName("TrkKphi_Histo");
 
 	TH1F *TrkKchi2_Histo = new TH1F("TrkKchi2_Histo","TrkKchi2_Histo",10,0,3);
@@ -229,7 +310,7 @@ int analysisB2019()
 	//-----------------------------------------------------------------------------
 
 	//-------Reading the root file and the tree-------------------------------------	
-	TFile *f1 = new TFile("D0DstarData_test1_5.root");
+	TFile *f1 = new TFile("D0DstarData_parcialfiles.root");
 	TTree *t1 = (TTree*)f1->Get("analysis/data");
 
 	//---------------------------------------------------------------------------------
@@ -238,8 +319,75 @@ int analysisB2019()
 	//For Variables
 	//TBranch *b_Total_Events = t1->GetBranch("Total_Events");
 	//b_Total_Events->SetAddress(&Total_Events);
-	
 
+	if(Conters)
+	{
+	//counters
+	TBranch *b_Total_Events = t1->GetBranch("Total_Events");
+	b_Total_Events->SetAddress(&Total_Events);
+	TBranch *b_TotalTracks = t1->GetBranch("TotalTracks");
+	b_TotalTracks->SetAddress(&TotalTracks);
+	TBranch *b_TracksAfterTrigger = t1->GetBranch("TracksAfterTrigger");
+	b_TracksAfterTrigger->SetAddress(&TracksAfterTrigger);
+	TBranch *b_TracksHasTrackDetails = t1->GetBranch("TracksHasTrackDetails");
+	b_TracksHasTrackDetails->SetAddress(&TracksHasTrackDetails);
+	TBranch *b_TracksChargeZero = t1->GetBranch("TracksChargeZero");
+	b_TracksChargeZero->SetAddress(&TracksChargeZero);
+	TBranch *b_TracksHighPurity = t1->GetBranch("TracksHighPurity");
+	b_TracksHighPurity->SetAddress(&TracksHighPurity);
+	TBranch *b_TracksPDG211 = t1->GetBranch("TracksPDG211");
+	b_TracksPDG211->SetAddress(&TracksPDG211);
+	TBranch *b_TracksPtZeroFive = t1->GetBranch("TracksPtZeroFive");
+	b_TracksPtZeroFive->SetAddress(&TracksPtZeroFive);
+	TBranch *b_TracksNumberOfHits2 = t1->GetBranch("TracksNumberOfHits2");
+	b_TracksNumberOfHits2->SetAddress(&TracksNumberOfHits2);
+	TBranch *b_TracksDxyThree = t1->GetBranch("TracksDxyThree");
+	b_TracksDxyThree->SetAddress(&TracksDxyThree);
+	TBranch *b_TracksDzThree = t1->GetBranch("TracksDzThree");
+	b_TracksDzThree->SetAddress(&TracksDzThree);
+	TBranch *b_TrackSlowPionCandidates = t1->GetBranch("TrackSlowPionCandidates");
+	b_TrackSlowPionCandidates->SetAddress(&TrackSlowPionCandidates);
+	TBranch *b_Observation = t1->GetBranch("Observation");
+	b_Observation->SetAddress(&Observation);
+	TBranch *b_TracksPtZeroSix = t1->GetBranch("TracksPtZeroSix");
+	b_TracksPtZeroSix->SetAddress(&TracksPtZeroSix);
+	TBranch *b_TracksChiTwoFive = t1->GetBranch("TracksChiTwoFive");
+	b_TracksChiTwoFive->SetAddress(&TracksChiTwoFive);
+	TBranch *b_TracksNumberOfHits5 = t1->GetBranch("TracksNumberOfHits5");
+	b_TracksNumberOfHits5->SetAddress(&TracksNumberOfHits5);
+	TBranch *b_TracksNumberOfPixelHits2 = t1->GetBranch("TracksNumberOfPixelHits2");
+	b_TracksNumberOfPixelHits2->SetAddress(&TracksNumberOfPixelHits2);
+	TBranch *b_TracksDzOne = t1->GetBranch("TracksDzOne");
+	b_TracksDzOne->SetAddress(&TracksDzOne);
+	TBranch *b_TracksDxyZeroOne = t1->GetBranch("TracksDxyZeroOne");
+	b_TracksDxyZeroOne->SetAddress(&TracksDxyZeroOne);
+	TBranch *b_TrackKaonPionCandidates = t1->GetBranch("TrackKaonPionCandidates");
+	b_TrackKaonPionCandidates->SetAddress(&TrackKaonPionCandidates);
+
+	TBranch *b_D0AfterLorentzVector = t1->GetBranch("D0AfterLorentzVector");
+	b_D0AfterLorentzVector->SetAddress(&D0AfterLorentzVector);
+	TBranch *b_DsMinusD0Zerothree = t1->GetBranch("DsMinusD0Zerothree");
+	b_DsMinusD0Zerothree->SetAddress(&DsMinusD0Zerothree); 
+	TBranch *b_TransientTrackOfpiK = t1->GetBranch("TransientTrackOfpiK");
+	b_TransientTrackOfpiK->SetAddress(&TransientTrackOfpiK);
+	TBranch *b_PointingcosPhi = t1->GetBranch("PointingcosPhi");
+	b_PointingcosPhi->SetAddress(&PointingcosPhi);
+	TBranch *b_Significance = t1->GetBranch("Significance");
+	b_Significance->SetAddress(&Significance);
+	TBranch *b_D0pTThree = t1->GetBranch("D0pTThree");
+	b_D0pTThree->SetAddress(&D0pTThree);
+	TBranch *b_D0Candidates = t1->GetBranch("D0Candidates");
+	b_D0Candidates->SetAddress(&D0Candidates);
+	TBranch *b_DsAfterLorentzVector = t1->GetBranch("DsAfterLorentzVector");
+	b_DsAfterLorentzVector->SetAddress(&DsAfterLorentzVector);
+	TBranch *b_DsMinusD0 = t1->GetBranch("DsMinusD0");
+	b_DsMinusD0->SetAddress(&DsMinusD0);
+	TBranch *b_DsCandidates = t1->GetBranch("DsCandidates");
+	b_DsCandidates->SetAddress(&DsCandidates);
+	}
+
+	if(VectorsHistograms)
+	{		
 	//For Vectors	
 	TBranch *b_D0mass = t1->GetBranch("D0mass");
 	b_D0mass->SetAddress(&D0mass);
@@ -247,6 +395,8 @@ int analysisB2019()
 	b_D0eta->SetAddress(&D0eta);
 	TBranch *b_D0phi = t1->GetBranch("D0phi");
 	b_D0phi->SetAddress(&D0phi);
+	TBranch *b_D0pt = t1->GetBranch("D0pt");
+	b_D0pt->SetAddress(&D0pt);  
 
 	TBranch *b_Dsmass = t1->GetBranch("Dsmass");
 	b_Dsmass->SetAddress(&Dsmass);
@@ -254,6 +404,8 @@ int analysisB2019()
 	b_Dseta->SetAddress(&Dseta);
 	TBranch *b_Dsphi = t1->GetBranch("Dsphi");
 	b_Dsphi->SetAddress(&Dsphi);
+	TBranch *b_Dspt = t1->GetBranch("Dspt");
+	b_Dspt->SetAddress(&Dspt);
 
 	TBranch *b_TrkSpt = t1->GetBranch("TrkSpt");
 	b_TrkSpt->SetAddress(&TrkSpt);
@@ -299,10 +451,7 @@ int analysisB2019()
 	b_TrkKphi->SetAddress(&TrkKphi);
 	TBranch *b_TrkKchi2 = t1->GetBranch("TrkKchi2");
 	b_TrkKchi2->SetAddress(&TrkKchi2);
-
-
-	
-
+	}
 
 	//**********************************************************		
 	//Reading Number of tree entries for file f1
@@ -313,24 +462,104 @@ int analysisB2019()
 	//cout<< "GetEntriesFast: "<< GetEntriesFast <<std::endl;
 
 	Long64_t nbytes = 0, nb = 0, i=0;
-	for (Long64_t jentry=0; jentry < nentries; jentry++) //loop tree entries for file f1
+	for (Long64_t jentry=0; jentry < 2000000; jentry++) //loop tree entries for file f1
 	{
       	Long64_t ientry = t1->LoadTree(jentry);
       	//std::cout << "nentries " << nentries << " ientry " << ientry << " jentry " << jentry <<std::endl;
-   
       	if (ientry < 0) break;
-		//b_Total_Events->GetEntry(ientry);
-		
-		//counter_Muon_pythia += Muons;
-		//cout << "Total_Events: "<< Total_Events << endl;
 
+		//if ((jentry/nentries) % (nentries*0.01) == 0) cout <<"*****"<< (jentry*100)/nentries << "per cent done***" << endl;
+		//{
+			
+		//}
+
+		double percent = (jentry*100)/2000000;
+		if (jentry % 10000 == 0) cout <<"*****"<< percent << "per cent done***" << endl;
+		//cout <<"*****entrada"<< jentry << "***" << endl;
+
+		if(Conters)
+		{
+		//counters
+		b_Total_Events->GetEntry(ientry);				
+		b_TotalTracks->GetEntry(ientry);
+		b_TracksAfterTrigger->GetEntry(ientry);
+		b_TracksHasTrackDetails->GetEntry(ientry);
+		b_TracksChargeZero->GetEntry(ientry);
+		b_TracksHighPurity->GetEntry(ientry);
+		b_TracksPDG211->GetEntry(ientry);
+		b_TracksPtZeroFive->GetEntry(ientry);
+		b_TracksNumberOfHits2->GetEntry(ientry);
+		b_TracksDxyThree->GetEntry(ientry);
+		b_TracksDzThree->GetEntry(ientry);
+		b_TrackSlowPionCandidates->GetEntry(ientry);
+		b_TracksPtZeroSix->GetEntry(ientry); 
+		b_Observation->GetEntry(ientry);
+		b_TracksChiTwoFive->GetEntry(ientry);
+		b_TracksNumberOfHits5->GetEntry(ientry);
+		b_TracksNumberOfPixelHits2->GetEntry(ientry);
+		b_TracksDxyZeroOne->GetEntry(ientry);
+		b_TracksDzOne->GetEntry(ientry);
+		b_TrackKaonPionCandidates->GetEntry(ientry);
+
+		b_D0AfterLorentzVector->GetEntry(ientry);
+		b_DsMinusD0Zerothree->GetEntry(ientry);
+		b_TransientTrackOfpiK->GetEntry(ientry);
+		b_PointingcosPhi->GetEntry(ientry);
+		b_Significance->GetEntry(ientry);
+		b_D0pTThree->GetEntry(ientry);
+		b_D0Candidates->GetEntry(ientry);
+		b_DsMinusD0->GetEntry(ientry);
+		b_DsCandidates->GetEntry(ientry);
+		b_DsAfterLorentzVector->GetEntry(ientry);
+
+		countTotalEvents += Total_Events;
+		countTotalTracks += TotalTracks;
+		countTracksAfterTrigger += TracksAfterTrigger;
+		countTracksHasTrackDetails += TracksHasTrackDetails;
+		countTracksChargeZero += TracksChargeZero;
+		countTracksHighPurity += TracksHighPurity;
+		countTracksPDG211 += TracksPDG211;
+		countTracksPtZeroFive += TracksPtZeroFive;
+		countTracksNumberOfHits2 += TracksNumberOfHits2;
+		countTracksDxyThree += TracksDxyThree;
+		countTracksDzThree += TracksDzThree;
+		countTrackSlowPionCandidates += TrackSlowPionCandidates;
+		countTracksPtZeroSix += TracksPtZeroSix;
+		countObservation += Observation;
+		countTracksChiTwoFive += TracksChiTwoFive;
+		countTracksNumberOfHits5 += TracksNumberOfHits5;
+		countTracksNumberOfPixelHits2 += TracksNumberOfPixelHits2;
+		countTracksDxyZeroOne += TracksDxyZeroOne;
+		countTracksDzOne += TracksDzOne;
+		countTrackKaonPionCandidates += TrackKaonPionCandidates;
+
+		countD0AfterLorentzVector += D0AfterLorentzVector;
+		countDsMinusD0Zerothree += DsMinusD0Zerothree;
+		countTransientTrackOfpiK += TransientTrackOfpiK;
+		countPointingcosPhi += PointingcosPhi;
+		countSignificance += Significance;
+		countD0pTThree += D0pTThree;
+		countD0Candidates += D0Candidates;
+		countDsAfterLorentzVector += DsAfterLorentzVector;
+		countDsMinusD0 += DsMinusD0;
+		countDsCandidates += DsCandidates;
+		}//End Flag Conters		
+
+		if(VectorsHistograms)
+		{
+		//vectors
        	b_D0mass->GetEntry(ientry);
-		b_Dsmass->GetEntry(ientry);
 		b_D0eta->GetEntry(ientry);
-		b_Dseta->GetEntry(ientry);
 		b_D0phi->GetEntry(ientry);
-		b_Dsphi->GetEntry(ientry);
+		b_D0pt->GetEntry(ientry);
 
+		b_Dsmass->GetEntry(ientry);
+		b_Dseta->GetEntry(ientry);	
+		b_Dsphi->GetEntry(ientry); 
+		b_Dspt->GetEntry(ientry);
+
+		if(Meson)
+		{
 		b_TrkSpt->GetEntry(ientry);
 		b_TrkSnhits->GetEntry(ientry);
 		b_TrkSdxy->GetEntry(ientry);
@@ -354,40 +583,48 @@ int analysisB2019()
 		b_TrkKeta->GetEntry(ientry);
 		b_TrkKphi->GetEntry(ientry);
 		b_TrkKchi2->GetEntry(ientry);
-	
+		}
 
 		//For D0
 		for(Long64_t i=0; i < D0mass->size(); i++)
 		{  
 			D0mass_Histo->Fill(D0mass->at(i));
+			vectorInvariantMass_D0.push_back(D0mass->at(i));
   		}
-
 		for(Long64_t i=0; i < D0eta->size(); i++)
 		{  
 			D0eta_Histo->Fill(D0eta->at(i));
   		}
-
 		for(Long64_t i=0; i < D0phi->size(); i++)
 		{  
 			D0phi_Histo->Fill(D0phi->at(i));
+  		}
+		for(Long64_t i=0; i < D0phi->size(); i++)
+		{  
+			D0pt_Histo->Fill(D0pt->at(i));
   		}
 
 		//For D*
 		for(Long64_t i=0; i < Dsmass->size(); i++)
 		{  
 			Dsmass_Histo->Fill(Dsmass->at(i));
+			vectorInvariantMass_Dstar.push_back(Dsmass->at(i));
   		}
-
 		for(Long64_t i=0; i < Dseta->size(); i++)
 		{  
 			Dseta_Histo->Fill(Dseta->at(i));
   		}
-
 		for(Long64_t i=0; i < Dsphi->size(); i++)
 		{  
 			Dsphi_Histo->Fill(Dsphi->at(i));
   		}
+		for(Long64_t i=0; i < Dsphi->size(); i++)
+		{  
+			Dspt_Histo->Fill(Dspt->at(i));
+  		}
 
+		if(Meson)
+		{
 		//For SlowPion
 		for(Long64_t i=0; i < TrkSpt->size(); i++)
 		{  
@@ -496,10 +733,19 @@ int analysisB2019()
 		{  
 			TrkKchi2_Histo->Fill(TrkKchi2->at(i));
   		}
-
+		}//End Flag Meson
+		}//End Flag VectorsHistograms
 			
 	}//End loop tree entries for file f1
 
+	TFile f_analysis("DMesonsMass.root","recreate"); //Creates root file
+	TTree t_analysis("t_analysis","analise_Tree"); //Creates a Tree
+	t_analysis.Branch("vectorInvariantMass_Dstar",&vectorInvariantMass_Dstar); //Creates a branch
+	t_analysis.Branch("vectorInvariantMass_D0",&vectorInvariantMass_D0); //Creates a branch
+	t_analysis.Fill();
+	Dsmass_Histo->Write(); //Write() if a file is open, this function writes a root objectics on it.
+	D0mass_Histo->Write(); //Write() if a file is open, this function writes a root objectics on it.
+	t_analysis.Write();  //Write in the root file
 
 	//TFile f_analysis("Jpsi.root","recreate"); //Creates root file
 	//TTree t_analysis("t_analysis","analise_Tree"); //Creates a Tree
@@ -508,217 +754,250 @@ int analysisB2019()
 	//h_DimuonsOppositeChargeEtaJpsi_M2_Double.Write(); //Write() if a file is open, this function writes a root objectics on it.
 	//t_analysis.Write();  //Write in the root file
 
-	//cout << "        " << endl;	
-	//cout << "======================================================== " << endl;
-	//cout << "count_Total_Events_pythia: "<< count_Total_Events_pythia << endl;	
-	//cout << "======================================================== " << endl;
-	//cout << "        " << endl;
 
-    //=========================================================================	
-	//Creating Canvas
-	TCanvas* c1 = new TCanvas("c1","Canvas 1 - behavior of the D",1200,600);
-	c1->Divide(2);
-	c1->cd(1);
+	cout << "countTotalEvents: "<< countTotalEvents << endl;
+	cout << "        " << endl;	
+	cout << "=============Tracks=========================================== " << endl;
+	cout << "countTotalTracks: "<< countTotalTracks << endl;
+	cout << "countTracksAfterTrigger: "<< countTracksAfterTrigger << endl;
+	cout << "countTracksHasTrackDetails: "<< countTracksHasTrackDetails << endl;
+	cout << "countTracksChargeZero: "<< countTracksChargeZero << endl;
+	cout << "countTracksHighPurity: "<< countTracksHighPurity << endl;
+	cout << "countTracksPDG211: "<< countTracksPDG211 << endl;
+	cout << "=============Criteria to SlowPion Tracks=======================" << endl;
+	cout << "countTracksPtZeroFive: "<< countTracksPtZeroFive << endl;
+	cout << "countTracksNumberOfHits2: "<< countTracksNumberOfHits2 << endl;
+	cout << "countTracksDxyThree: "<< countTracksDxyThree << endl;
+	cout << "countTracksDzThree: "<< countTracksDzThree << endl;
+	cout << "countTrackSlowPionCandidates: "<< countTrackSlowPionCandidates << endl;
+	cout << "Observation: "<< Observation << endl;
+	cout << "=============Criteria to Pions and Kaons Tracks=======================" << endl;
+	cout << "countTracksPtZeroSix: "<< countTracksPtZeroSix << endl;
+	cout << "countTracksChiTwoFive: "<< countTracksChiTwoFive << endl;
+	cout << "countTracksNumberOfHits5: "<< countTracksNumberOfHits5 << endl;
+	cout << "countTracksNumberOfPixelHits2: "<< countTracksNumberOfPixelHits2 << endl;
+	cout << "countTracksDxyZeroOne: "<< countTracksDxyZeroOne << endl;
+	cout << "countTracksDzOne: "<< countTracksDzOne << endl;
+	cout << "countTrackKaonPionCandidates: "<< countTrackKaonPionCandidates << endl;
+	cout << "=============Criteria to D0 and D* =======================" << endl;
+	cout << "countD0AfterLorentzVector: "<< countD0AfterLorentzVector << endl;
+	cout << "countDsMinusD0Zerothree: "<< countDsMinusD0Zerothree << endl;
+	cout << "countTransientTrackOfpiK: "<< countTransientTrackOfpiK << endl;
+	cout << "countPointingcosPhi: "<< countPointingcosPhi << endl;
+	cout << "countSignificance: "<< countSignificance << endl;
+	cout << "countD0pTThree: "<< countD0pTThree << endl;
+	cout << "countD0Candidates: "<< countD0Candidates << endl;
+	cout << "countDsAfterLorentzVector: "<< countDsAfterLorentzVector << endl;
+	cout << "countDsMinusD0: "<< countDsMinusD0 << endl;
+	cout << "countDsCandidates: "<< countDsCandidates << endl;
+	
+	if(VectorsHistograms)
+	{
+    //========Creating Canvas=================================================================	
+	TCanvas* c0 = new TCanvas("c0","Canvas 0 - behavior of the D",1200,600);
+	c0->Divide(2);
+	c0->cd(1);
 	//D0mass_Histo->SetLineColor(kBlue);
 	D0mass_Histo->SetMarkerStyle(7);
 	//D0mass_Histo->SetMarkerStyle(21);
 	//D0mass_Histo->SetStats(0);
 	//D0mass_Histo->SetMarkerColor(kBlue);
 	//D0mass_Histo->SetFillColor(kBlue);
+	D0mass_Histo->Sumw2();
 	D0mass_Histo->Draw("e1p");
+	//D0mass_Histo->Draw("e0");
 	//D0mass_Histo->Draw("e1pSAME");
-	TLegend* leg_D0mass = new TLegend(0.82,0.5,0.95,0.65);
+	/*TLegend* leg_D0mass = new TLegend(0.5,0.5,0.75,0.65);
    	leg_D0mass->SetFillColor(kWhite);
 	leg_D0mass->SetFillStyle(1001);
 	leg_D0mass->SetBorderSize(0);
-	//leg_D0mass->AddEntry(h_leadingMuon_Pt2,"Data 2011","e1pSAME");
+	leg_D0mass->AddEntry(D0mass_Histo,"pT > 3 GeV","e1pSAME");
 	leg_D0mass->AddEntry(D0mass_Histo,"D0mass","L");
-	leg_D0mass->Draw();
+	leg_D0mass->Draw();*/
 	//-------------------------------------------------------------------------
-	c1->cd(2);
-	//Dsmass_Histo->SetLineColor(kBlue);
+	c0->cd(2);
+	Dsmass_Histo->SetLineColor(kBlue);
 	Dsmass_Histo->SetMarkerStyle(7);
-	//Dsmass_Histo->SetMarkerStyle(21);
-	//Dsmass_Histo->SetStats(0);
-	//Dsmass_Histo->SetMarkerColor(kBlue);
-	//Dsmass_Histo->SetFillColor(kBlue);
+    Dsmass_Histo->Sumw2();
 	Dsmass_Histo->Draw("e1p");
 	//Dsmass_Histo->Draw("e1pSAME");
-	TLegend* leg_Dsmass = new TLegend(0.82,0.5,0.95,0.65);
+	/*TLegend* leg_Dsmass = new TLegend(0.82,0.5,0.95,0.65);
    	leg_Dsmass->SetFillColor(kWhite);
 	leg_Dsmass->SetFillStyle(1001);
 	leg_Dsmass->SetBorderSize(0);
 	//leg_Dsmass->AddEntry(h_leadingMuon_Pt2,"Data 2011","e1pSAME");
 	leg_Dsmass->AddEntry(Dsmass_Histo,"Dsmass","L");
-	leg_Dsmass->Draw();
-
-	//c1->SaveAs("/eos/user/r/ragomesd/analysisB2019/Canvas1.png");
+	leg_Dsmass->Draw();*/
+	c0->SaveAs("/eos/user/r/ragomesd/analysisB2019/canvas/Canvas0.png");
+	//=========================================================================	
+	//Creating Canvas
+	TCanvas* c1 = new TCanvas("c1","Canvas 1 - behavior of the D",1200,600);
+	c1->Divide(2);
+	c1->cd(1);
+	//D0eta_Histo->SetLineColor(kBlue);
+	D0pt_Histo->SetMarkerStyle(7);
+	D0pt_Histo->Draw("HIST");
+	//D0pt_Histo->Draw("e1pSAME");
+	TLegend* leg_D0pt = new TLegend(0.5,0.5,0.65,0.6);
+   	leg_D0pt->SetFillColor(kWhite);
+	leg_D0pt->SetFillStyle(1001);
+	leg_D0pt->SetBorderSize(0);
+	leg_D0pt->AddEntry(D0pt_Histo,"pT > 3 GeV","L" );
+	//leg_D0pt->AddEntry(D0eta_Histo,"D0eta","L");
+	leg_D0pt->Draw();
+	//-------------------------------------------------------------------------
+	c1->cd(2);
+	//Dseta_Histo->SetLineColor(kBlue);
+	Dspt_Histo->SetMarkerStyle(7);
+	Dspt_Histo->Draw("HIST");
+	//Dspt_Histo->Draw("e1pSAME");	
+	/*TLegend* leg_Dspt = new TLegend(0.82,0.5,0.95,0.65);
+   	leg_Dspt->SetFillColor(kWhite);
+	leg_Dspt->SetFillStyle(1001);
+	leg_Dspt->SetBorderSize(0);
+	//leg_Dspt->AddEntry(h_leadingMuon_Pt2,"Data 2011","e1pSAME");
+	leg_Dspt->AddEntry(Dspt_Histo,"Dseta","L");
+	leg_Dspt->Draw();*/
+	c1->SaveAs("/eos/user/r/ragomesd/analysisB2019/canvas/Canvas1.png");
 	//=========================================================================	
 	//Creating Canvas
 	TCanvas* c2 = new TCanvas("c2","Canvas 2 - behavior of the D",1200,600);
-	c2->Divide(2,2);
+	c2->Divide(2);
 	c2->cd(1);
 	//D0eta_Histo->SetLineColor(kBlue);
 	D0eta_Histo->SetMarkerStyle(7);
-	//D0eta_Histo->SetMarkerStyle(21);
-	//D0eta_Histo->SetStats(0);
-	//D0eta_Histo->SetMarkerColor(kBlue);
-	//D0eta_Histo->SetFillColor(kBlue);
 	D0eta_Histo->Draw("HIST");
 	//D0eta_Histo->Draw("e1pSAME");
-	TLegend* leg_D0eta = new TLegend(0.82,0.5,0.95,0.65);
+	/*TLegend* leg_D0eta = new TLegend(0.82,0.5,0.95,0.65);
    	leg_D0eta->SetFillColor(kWhite);
 	leg_D0eta->SetFillStyle(1001);
 	leg_D0eta->SetBorderSize(0);
 	//leg_D0eta->AddEntry(h_leadingMuon_Pt2,"Data 2011","e1pSAME");
 	leg_D0eta->AddEntry(D0eta_Histo,"D0eta","L");
-	leg_D0eta->Draw();
+	leg_D0eta->Draw();*/
 	//-------------------------------------------------------------------------
 	c2->cd(2);
 	//Dseta_Histo->SetLineColor(kBlue);
 	Dseta_Histo->SetMarkerStyle(7);
-	//Dseta_Histo->SetMarkerStyle(21);
-	//Dseta_Histo->SetStats(0);
-	//Dseta_Histo->SetMarkerColor(kBlue);
-	//Dseta_Histo->SetFillColor(kBlue);
 	Dseta_Histo->Draw("HIST");
 	//Dsmass_Histo->Draw("e1pSAME");	
-	TLegend* leg_Dseta = new TLegend(0.82,0.5,0.95,0.65);
+	/*TLegend* leg_Dseta = new TLegend(0.82,0.5,0.95,0.65);
    	leg_Dseta->SetFillColor(kWhite);
 	leg_Dseta->SetFillStyle(1001);
 	leg_Dseta->SetBorderSize(0);
 	//leg_Dsmass->AddEntry(h_leadingMuon_Pt2,"Data 2011","e1pSAME");
 	leg_Dseta->AddEntry(Dseta_Histo,"Dseta","L");
-	leg_Dseta->Draw();
+	leg_Dseta->Draw();*/
+	c2->SaveAs("/eos/user/r/ragomesd/analysisB2019/canvas/Canvas2.png");
 	//-------------------------------------------------------------------------
-	c2->cd(3);
+	TCanvas* c3 = new TCanvas("c3","Canvas 3 - behavior of the D",1200,600);
+	c3->Divide(2);	
+	c3->cd(1);
 	//D0phi_Histo->SetLineColor(kBlue);
 	D0phi_Histo->SetMarkerStyle(7);
-	//D0phi_Histo->SetMarkerStyle(21);
-	//D0phi_Histo->SetStats(0);
-	//D0phi_Histo->SetMarkerColor(kBlue);
-	//D0phi_Histo->SetFillColor(kBlue);
 	D0phi_Histo->Draw("HIST");
 	//D0eta_Histo->Draw("e1pSAME");
-	TLegend* leg_D0phi = new TLegend(0.82,0.5,0.95,0.65);
+	/*TLegend* leg_D0phi = new TLegend(0.82,0.5,0.95,0.65);
    	leg_D0phi->SetFillColor(kWhite);
 	leg_D0phi->SetFillStyle(1001);
 	leg_D0phi->SetBorderSize(0);
 	//leg_D0phi->AddEntry(h_leadingMuon_Pt2,"Data 2011","e1pSAME");
 	leg_D0phi->AddEntry(D0phi_Histo,"D0phi","L");
-	leg_D0phi->Draw();
+	leg_D0phi->Draw();*/
 	//-------------------------------------------------------------------------
-	c2->cd(4);	
+	c3->cd(2);	
 	//Dsphi_Histo->SetLineColor(kBlue);
 	Dsphi_Histo->SetMarkerStyle(7);
-	//Dsphi_Histo->SetMarkerStyle(21);
-	//Dseta_Histo->SetStats(0);
-	//Dsphi_Histo->SetMarkerColor(kBlue);
-	//Dsphi_Histo->SetFillColor(kBlue);
 	Dsphi_Histo->Draw("HIST");
 	//Dsphi_Histo->Draw("e1pSAME");	
-	TLegend* leg_Dsphi = new TLegend(0.82,0.5,0.95,0.65);
+	/*TLegend* leg_Dsphi = new TLegend(0.82,0.5,0.95,0.65);
    	leg_Dsphi->SetFillColor(kWhite);
 	leg_Dsphi->SetFillStyle(1001);
 	leg_Dsphi->SetBorderSize(0);
 	//leg_Dsmass->AddEntry(h_leadingMuon_Pt2,"Data 2011","e1pSAME");
 	leg_Dsphi->AddEntry(Dsphi_Histo,"Dsphi","L");
-	leg_Dsphi->Draw();
-//	c2->SaveAs("/eos/user/r/ragomesd/analysisB2019/Canvas2.png");
+	leg_Dsphi->Draw();*/
+	c3->SaveAs("/eos/user/r/ragomesd/analysisB2019/canvas/Canvas3.png");
+
+	if(Meson)
+	{
 	//=========================================================================	
 	//Creating Canvas
-	TCanvas* c3 = new TCanvas("c3","Canvas 3 - behavior of the SlowPion",1200,600);
-	c3->Divide(2,2);
-	c3->cd(1);
+	TCanvas* c4 = new TCanvas("c4","Canvas 4 - behavior of the SlowPion",1200,600);
+	c4->Divide(2);
+	c4->cd(1);
 	//TrkSpt_Histo->SetLineColor(kBlue);
 	TrkSpt_Histo->SetMarkerStyle(7);
-	TrkSpt_Histo->SetMarkerStyle(21);
-	//TrkSpt_Histo->SetStats(0);
-	//TrkSpt_Histo->SetMarkerColor(kBlue);
-	//TrkSpt_Histo->SetFillColor(kBlue);
 	TrkSpt_Histo->Draw("HIST");
 	//TrkSpt_Histo->Draw("e1pSAME");
-	TLegend* leg_TrkSpt = new TLegend(0.82,0.5,0.95,0.65);
+	/*TLegend* leg_TrkSpt = new TLegend(0.82,0.5,0.95,0.65);
    	leg_TrkSpt->SetFillColor(kWhite);
 	leg_TrkSpt->SetFillStyle(1001);
 	leg_TrkSpt->SetBorderSize(0);
 	//leg_TrkSpt->AddEntry(h_leadingMuon_Pt2,"Data 2011","e1pSAME");
 	leg_TrkSpt->AddEntry(TrkSpt_Histo,"TrkSpt","L");
-	leg_TrkSpt->Draw();
+	leg_TrkSpt->Draw();*/
 	//-------------------------------------------------------------------------
-	c3->cd(2);
+	c4->cd(2);
 	//TrkSnhits_Histo->SetLineColor(kBlue);
 	TrkSnhits_Histo->SetMarkerStyle(7);
-	//TrkSnhits_Histo->SetMarkerStyle(21);
-	//TrkSnhits_Histo->SetStats(0);
-	//TrkSnhits_Histo->SetMarkerColor(kBlue);
-	//TrkSnhits_Histo->SetFillColor(kBlue);
 	TrkSnhits_Histo->Draw("HIST");
 	//Dsphi_Histo->Draw("e1pSAME");
-	TLegend* leg_TrkSnhits = new TLegend(0.82,0.5,0.95,0.65);
+	/*TLegend* leg_TrkSnhits = new TLegend(0.82,0.5,0.95,0.65);
    	leg_TrkSnhits->SetFillColor(kWhite);
 	leg_TrkSnhits->SetFillStyle(1001);
 	leg_TrkSnhits->SetBorderSize(0);
 	//leg_TrkSnhits->AddEntry(h_leadingMuon_Pt2,"Data 2011","e1pSAME");
 	leg_TrkSnhits->AddEntry(TrkSnhits_Histo,"TrkSnhits","L");
-	leg_TrkSnhits->Draw();
+	leg_TrkSnhits->Draw();*/
+	c4->SaveAs("/eos/user/r/ragomesd/analysisB2019/canvas/Canvas4.png");
 	//-------------------------------------------------------------------------
-	c3->cd(3);
+	TCanvas* c5 = new TCanvas("c5","Canvas 5 - behavior of the D",1200,600);
+	c5->Divide(2);
+	c5->cd(1);
 	//TrkSdxy_Histo->SetLineColor(kBlue);
 	TrkSdxy_Histo->SetMarkerStyle(7);
-	//TrkSdxy_Histo->SetMarkerStyle(21);
-	//TrkSnhits_Histo->SetStats(0);
-	//TrkSdxy_Histo->SetMarkerColor(kBlue);
-	//TrkSdxy_Histo->SetFillColor(kBlue);
 	TrkSdxy_Histo->Draw("HIST");
 	//TrkSdxy_Histo->Draw("e1pSAME");
-	TLegend* leg_TrkSdxy = new TLegend(0.82,0.5,0.95,0.65);
+	/*TLegend* leg_TrkSdxy = new TLegend(0.82,0.5,0.95,0.65);
    	leg_TrkSdxy->SetFillColor(kWhite);
 	leg_TrkSdxy->SetFillStyle(1001);
 	leg_TrkSdxy->SetBorderSize(0);
 	//leg_TrkSdxy->AddEntry(h_leadingMuon_Pt2,"Data 2011","e1pSAME");
 	leg_TrkSdxy->AddEntry(TrkSdxy_Histo,"TrkSdxy","L");
-	leg_TrkSdxy->Draw();
+	leg_TrkSdxy->Draw();*/
 	//-------------------------------------------------------------------------
-	c3->cd(4);
+	c5->cd(2);
 	//TrkSdz_Histo->SetLineColor(kBlue);
 	TrkSdz_Histo->SetMarkerStyle(7);
-	//TrkSdz_Histo->SetMarkerStyle(21);
-	//TrkSdz_Histo->SetStats(0);
-	//TrkSdz_Histo->SetMarkerColor(kBlue);
-	//TrkSdz_Histo->SetFillColor(kBlue);
 	TrkSdz_Histo->Draw("HIST");
 	//TrkSdz_Histo->Draw("e1pSAME");
-	TLegend* leg_TrkSdz = new TLegend(0.82,0.5,0.95,0.65);
+	/*TLegend* leg_TrkSdz = new TLegend(0.82,0.5,0.95,0.65);
    	leg_TrkSdz->SetFillColor(kWhite);
 	leg_TrkSdz->SetFillStyle(1001);
 	leg_TrkSdz->SetBorderSize(0);
 	//leg_TrkSdz->AddEntry(h_leadingMuon_Pt2,"Data 2011","e1pSAME");
 	leg_TrkSdz->AddEntry(TrkSdz_Histo,"TrkSdz","L");
-	leg_TrkSdz->Draw();
-//	c3->SaveAs("/eos/user/r/ragomesd/analysisB2019/Canvas3.png");
+	leg_TrkSdz->Draw();*/
+	c5->SaveAs("/eos/user/r/ragomesd/analysisB2019/canvas/Canvas5.png");
 	//=========================================================================	
 	//Creating Canvas
-	TCanvas* c4 = new TCanvas("c4","Canvas 4 - behavior of the SlowPion",1200,600);
-	c4->Divide(2,2);
-	c4->cd(1);
+	TCanvas* c6 = new TCanvas("c6","Canvas 6 - behavior of the SlowPion",1200,600);
+	c6->Divide(2);
+	c6->cd(1);
 	//TrkSeta_Histo->SetLineColor(kBlue);
 	TrkSeta_Histo->SetMarkerStyle(7);
-	//TrkSeta_Histo->SetMarkerStyle(21);
-	//TrkSeta_Histo->SetStats(0);
-	//TrkSeta_Histo->SetMarkerColor(kBlue);
-	//TrkSeta_Histo->SetFillColor(kBlue);
 	TrkSeta_Histo->Draw("HIST");
 	//TrkSeta_Histo->Draw("e1pSAME");
-	TLegend* leg_TrkSeta = new TLegend(0.82,0.5,0.95,0.65);
+	/*TLegend* leg_TrkSeta = new TLegend(0.82,0.5,0.95,0.65);
    	leg_TrkSeta->SetFillColor(kWhite);
 	leg_TrkSeta->SetFillStyle(1001);
 	leg_TrkSeta->SetBorderSize(0);
 	//leg_TrkSeta->AddEntry(h_leadingMuon_Pt2,"Data 2011","e1pSAME");
 	leg_TrkSeta->AddEntry(TrkSeta_Histo,"TrkSeta","L");
-	leg_TrkSeta->Draw();
+	leg_TrkSeta->Draw();*/
 	//-------------------------------------------------------------------------
-	c4->cd(2);
+	c6->cd(2);
 	//TrkSphi_Histo->SetLineColor(kBlue);
 	TrkSphi_Histo->SetMarkerStyle(7);
 	//TrkSphi_Histo->SetMarkerStyle(21);
@@ -727,284 +1006,246 @@ int analysisB2019()
 	//TrkSphi_Histo->SetFillColor(kBlue);
 	TrkSphi_Histo->Draw("HIST");
 	//TrkSphi_Histo->Draw("e1pSAME");
-	TLegend* leg_TrkSphi = new TLegend(0.82,0.5,0.95,0.65);
+	/*TLegend* leg_TrkSphi = new TLegend(0.82,0.5,0.95,0.65);
    	leg_TrkSphi->SetFillColor(kWhite);
 	leg_TrkSphi->SetFillStyle(1001);
 	leg_TrkSphi->SetBorderSize(0);
 	//leg_TrkSphi->AddEntry(h_leadingMuon_Pt2,"Data 2011","e1pSAME");
 	leg_TrkSphi->AddEntry(TrkSphi_Histo,"TrkSphi","L");
-	leg_TrkSphi->Draw();
+	leg_TrkSphi->Draw();*/
+	c6->SaveAs("/eos/user/r/ragomesd/analysisB2019/canvas/Canvas6.png");
 	//-------------------------------------------------------------------------
-	c4->cd(3);
+	TCanvas* c7 = new TCanvas("c7","Canvas 7 - behavior of the D",1200,600);
+	c7->Divide(2);
+	c7->cd(1);
 	//TrkSchi2_Histo->SetLineColor(kBlue);
 	TrkSchi2_Histo->SetMarkerStyle(7);
-	//TrkSchi2_Histo->SetMarkerStyle(21);
-	//TrkSchi2_Histo->SetStats(0);
-	//TrkSchi2_Histo->SetMarkerColor(kBlue);
-	//TrkSchi2_Histo->SetFillColor(kBlue);
 	TrkSchi2_Histo->Draw("HIST");
 	//TrkSchi2_Histo->Draw("e1pSAME");
-	TLegend* leg_TrkSchi2 = new TLegend(0.82,0.5,0.95,0.65);
+	/*TLegend* leg_TrkSchi2 = new TLegend(0.82,0.5,0.95,0.65);
    	leg_TrkSchi2->SetFillColor(kWhite);
 	leg_TrkSchi2->SetFillStyle(1001);
 	leg_TrkSchi2->SetBorderSize(0);
 	//leg_TrkSchi2->AddEntry(h_leadingMuon_Pt2,"Data 2011","e1pSAME");
 	leg_TrkSchi2->AddEntry(TrkSchi2_Histo,"TrkSchi2","L");
-	leg_TrkSchi2->Draw();
-//	c4->SaveAs("/eos/user/r/ragomesd/analysisB2019/Canvas4.png");
+	leg_TrkSchi2->Draw();*/
+	c7->SaveAs("/eos/user/r/ragomesd/analysisB2019/canvas/Canvas7.png");
 	//=========================================================================	
 	//Creating Canvas
-	TCanvas* c5 = new TCanvas("c5","Canvas 5 - behavior of the Pion",1200,600);
-	c5->Divide(2,2);
-	c5->cd(1);
+	TCanvas* c8 = new TCanvas("c8","Canvas 8 - behavior of the Pion",1200,600);
+	c8->Divide(2);
+	c8->cd(1);
 	//Trkpipt_Histo->SetLineColor(kBlue);
 	Trkpipt_Histo->SetMarkerStyle(7);
-	//Trkpipt_Histo->SetMarkerStyle(21);
-	//Trkpipt_Histo->SetStats(0);
-	//Trkpipt_Histo->SetMarkerColor(kBlue);
-	//Trkpipt_Histo->SetFillColor(kBlue);
 	Trkpipt_Histo->Draw("HIST");
 	//TrkSpt_Histo->Draw("e1pSAME");
-	TLegend* leg_Trkpipt = new TLegend(0.82,0.5,0.95,0.65);
+	/*TLegend* leg_Trkpipt = new TLegend(0.82,0.5,0.95,0.65);
    	leg_Trkpipt->SetFillColor(kWhite);
 	leg_Trkpipt->SetFillStyle(1001);
 	leg_Trkpipt->SetBorderSize(0);
 	//leg_Trkpipt->AddEntry(h_leadingMuon_Pt2,"Data 2011","e1pSAME");
 	leg_Trkpipt->AddEntry(Trkpipt_Histo,"Trkpipt","L");
-	leg_Trkpipt->Draw();
+	leg_Trkpipt->Draw();*/
 	//-------------------------------------------------------------------------
-	c5->cd(2);
+	c8->cd(2);
 	//Trkpinhits_Histo->SetLineColor(kBlue);
 	Trkpinhits_Histo->SetMarkerStyle(7);
-	//Trkpinhits_Histo->SetMarkerStyle(21);
-	//TrkSnhits_Histo->SetStats(0);
-	//Trkpinhits_Histo->SetMarkerColor(kBlue);
-	//Trkpinhits_Histo->SetFillColor(kBlue);
 	Trkpinhits_Histo->Draw("HIST");
 	//Trkpinhits_Histo->Draw("e1pSAME");
-	TLegend* leg_Trkpinhits = new TLegend(0.82,0.5,0.95,0.65);
+	/*TLegend* leg_Trkpinhits = new TLegend(0.82,0.5,0.95,0.65);
    	leg_Trkpinhits->SetFillColor(kWhite);
 	leg_Trkpinhits->SetFillStyle(1001);
 	leg_Trkpinhits->SetBorderSize(0);
 	//leg_TrkSnhits->AddEntry(h_leadingMuon_Pt2,"Data 2011","e1pSAME");
 	leg_Trkpinhits->AddEntry(Trkpinhits_Histo,"Trkpinhits","L");
-	leg_Trkpinhits->Draw();
+	leg_Trkpinhits->Draw();*/
+	c8->SaveAs("/eos/user/r/ragomesd/analysisB2019/canvas/Canvas8.png");
 	//-------------------------------------------------------------------------
-	c5->cd(3);
+	//Creating Canvas
+	TCanvas* c9 = new TCanvas("c9","Canvas 9 - behavior of the Pion",1200,600);
+	c9->Divide(2);
+	c9->cd(1);
 	//Trkpidxy_Histo->SetLineColor(kBlue);
 	Trkpidxy_Histo->SetMarkerStyle(7);
-	//Trkpidxy_Histo->SetMarkerStyle(21);
-	//Trkpidxy_Histo->SetStats(0);
-	//Trkpidxy_Histo->SetMarkerColor(kBlue);
-	//Trkpidxy_Histo->SetFillColor(kBlue);
 	Trkpidxy_Histo->Draw("HIST");
 	//Trkpidxy_Histo->Draw("e1pSAME");
-	TLegend* leg_Trkpidxy = new TLegend(0.82,0.5,0.95,0.65);
+	/*TLegend* leg_Trkpidxy = new TLegend(0.82,0.5,0.95,0.65);
    	leg_Trkpidxy->SetFillColor(kWhite);
 	leg_Trkpidxy->SetFillStyle(1001);
 	leg_Trkpidxy->SetBorderSize(0);
 	//leg_Trkpidxy->AddEntry(h_leadingMuon_Pt2,"Data 2011","e1pSAME");
 	leg_Trkpidxy->AddEntry(Trkpidxy_Histo,"Trkpidxy","L");
-	leg_Trkpidxy->Draw();
+	leg_Trkpidxy->Draw();*/
 	//-------------------------------------------------------------------------
-	c5->cd(4);
+	c9->cd(2);
 	//Trkpidz_Histo->SetLineColor(kBlue);
 	Trkpidz_Histo->SetMarkerStyle(7);
-	//Trkpidz_Histo->SetMarkerStyle(21);
-	//Trkpidz_Histo->SetStats(0);
-	//Trkpidz_Histo->SetMarkerColor(kBlue);
-	//Trkpidz_Histo->SetFillColor(kBlue);
 	Trkpidz_Histo->Draw("HIST");
 	//Trkpidz_Histo->Draw("e1pSAME");
-	TLegend* leg_Trkpidz = new TLegend(0.82,0.5,0.95,0.65);
+	/*TLegend* leg_Trkpidz = new TLegend(0.82,0.5,0.95,0.65);
    	leg_Trkpidz->SetFillColor(kWhite);
 	leg_Trkpidz->SetFillStyle(1001);
 	leg_Trkpidz->SetBorderSize(0);
 	//leg_Trkpidz->AddEntry(h_leadingMuon_Pt2,"Data 2011","e1pSAME");
 	leg_Trkpidz->AddEntry(Trkpidz_Histo,"Trkpidz","L");
-	leg_Trkpidz->Draw();
-//	c5->SaveAs("/eos/user/r/ragomesd/analysisB2019/Canvas5.png");
+	leg_Trkpidz->Draw();*/
+	c9->SaveAs("/eos/user/r/ragomesd/analysisB2019/canvas/Canvas9.png");
 	//=========================================================================	
 	//Creating Canvas
-	TCanvas* c6 = new TCanvas("c6","Canvas 6 - behavior of the Pion",1200,600);
-	c6->Divide(2,2);
-	c6->cd(1);
+	TCanvas* c10 = new TCanvas("c10","Canvas 10 - behavior of the Pion",1200,600);
+	c10->Divide(2);
+	c10->cd(1);
 	//Trkpieta_Histo->SetLineColor(kBlue);
 	Trkpieta_Histo->SetMarkerStyle(7);
-	//Trkpieta_Histo->SetMarkerStyle(21);
-	//Trkpieta_Histo->SetStats(0);
-	//Trkpieta_Histo->SetMarkerColor(kBlue);
-	//Trkpieta_Histo->SetFillColor(kBlue);
 	Trkpieta_Histo->Draw("HIST");
 	//Trkpieta_Histo->Draw("e1pSAME");
-	TLegend* leg_Trkpieta = new TLegend(0.82,0.5,0.95,0.65);
+	/*TLegend* leg_Trkpieta = new TLegend(0.82,0.5,0.95,0.65);
    	leg_Trkpieta->SetFillColor(kWhite);
 	leg_Trkpieta->SetFillStyle(1001);
 	leg_Trkpieta->SetBorderSize(0);
 	//leg_Trkpieta->AddEntry(h_leadingMuon_Pt2,"Data 2011","e1pSAME");
 	leg_Trkpieta->AddEntry(Trkpieta_Histo,"Trkpieta","L");
-	leg_Trkpieta->Draw();
+	leg_Trkpieta->Draw();*/
 	//-------------------------------------------------------------------------
-	c6->cd(2);
+	c10->cd(2);
 	//Trkpiphi_Histo->SetLineColor(kBlue);
 	Trkpiphi_Histo->SetMarkerStyle(7);
-	//Trkpiphi_Histo->SetMarkerStyle(21);
-	//TrkTrkpiphiSphi_Histo->SetStats(0);
-	//Trkpiphi_Histo->SetMarkerColor(kBlue);
-	//Trkpiphi_Histo->SetFillColor(kBlue);
 	Trkpiphi_Histo->Draw("HIST");
 	//Trkpiphi_Histo->Draw("e1pSAME");
-	TLegend* leg_Trkpiphi = new TLegend(0.82,0.5,0.95,0.65);
+	/*TLegend* leg_Trkpiphi = new TLegend(0.82,0.5,0.95,0.65);
    	leg_Trkpiphi->SetFillColor(kWhite);
 	leg_Trkpiphi->SetFillStyle(1001);
 	leg_Trkpiphi->SetBorderSize(0);
 	//leg_Trkpiphi->AddEntry(h_leadingMuon_Pt2,"Data 2011","e1pSAME");
 	leg_Trkpiphi->AddEntry(Trkpiphi_Histo,"Trkpiphi","L");
-	leg_Trkpiphi->Draw();
+	leg_Trkpiphi->Draw();*/
+	c10->SaveAs("/eos/user/r/ragomesd/analysisB2019/canvas/Canvas10.png");
 	//-------------------------------------------------------------------------
-	c6->cd(3);
+	//Creating Canvas
+	TCanvas* c11 = new TCanvas("c11","Canvas 11 - behavior of the Pion",1200,600);
+	c11->Divide(2);
+	c11->cd(1);
 	//Trkpichi2_Histo->SetLineColor(kBlue);
 	Trkpichi2_Histo->SetMarkerStyle(7);
-	//Trkpichi2_Histo->SetMarkerStyle(21);
-	//TrkTrkpichi2Sphi_Histo->SetStats(0);
-	//Trkpichi2_Histo->SetMarkerColor(kBlue);
-	//Trkpichi2_Histo->SetFillColor(kBlue);
 	Trkpichi2_Histo->Draw("HIST");
 	//Trkpichi2_Histo->Draw("e1pSAME");
-	TLegend* leg_Trkpichi2 = new TLegend(0.82,0.5,0.95,0.65);
+	/*TLegend* leg_Trkpichi2 = new TLegend(0.82,0.5,0.95,0.65);
    	leg_Trkpichi2->SetFillColor(kWhite);
 	leg_Trkpichi2->SetFillStyle(1001);
 	leg_Trkpichi2->SetBorderSize(0);
 	//leg_Trkpichi2->AddEntry(h_leadingMuon_Pt2,"Data 2011","e1pSAME");
 	leg_Trkpichi2->AddEntry(Trkpichi2_Histo,"Trkpichi2","L");
-	leg_Trkpichi2->Draw();
-//	c6->SaveAs("/eos/user/r/ragomesd/analysisB2019/Canvas6.png");
+	leg_Trkpichi2->Draw();*/
+	c11->SaveAs("/eos/user/r/ragomesd/analysisB2019/canvas/Canvas11.png");
+
 	//=========================================================================	
 	//Creating Canvas
-	TCanvas* c7 = new TCanvas("c7","Canvas 7 - behavior of the Kaon",1200,600);
-	c7->Divide(2,2);
-	c7->cd(1);
+	TCanvas* c12 = new TCanvas("c12","Canvas 12 - behavior of the Kaon",1200,600);
+	c12->Divide(2);
+	c12->cd(1);
 	//TrkKpt_Histo->SetLineColor(kBlue);
 	TrkKpt_Histo->SetMarkerStyle(7);
-	//TrkKpt_Histo->SetMarkerStyle(21);
-	//TrkKpt_Histo->SetStats(0);
-	//TrkKpt_Histo->SetMarkerColor(kBlue);
-	//TrkKpt_Histo->SetFillColor(kBlue);
 	TrkKpt_Histo->Draw("HIST");
 	//TrkSpt_Histo->Draw("e1pSAME");
-	TLegend* leg_TrkKpt = new TLegend(0.82,0.5,0.95,0.65);
+	/*TLegend* leg_TrkKpt = new TLegend(0.82,0.5,0.95,0.65);
    	leg_TrkKpt->SetFillColor(kWhite);
 	leg_TrkKpt->SetFillStyle(1001);
 	leg_TrkKpt->SetBorderSize(0);
 	//leg_TrkKpt->AddEntry(h_leadingMuon_Pt2,"Data 2011","e1pSAME");
 	leg_TrkKpt->AddEntry(TrkKpt_Histo,"TrkKpt","L");
-	leg_TrkKpt->Draw();
+	leg_TrkKpt->Draw();*/
 	//-------------------------------------------------------------------------
-	c7->cd(2);
+	c12->cd(2);
 	//TrkKnhits_Histo->SetLineColor(kBlue);
 	TrkKnhits_Histo->SetMarkerStyle(7);
-	//TrkKnhits_Histo->SetMarkerStyle(21);
-	//TrkSnhits_Histo->SetStats(0);
-	//TrkKnhits_Histo->SetMarkerColor(kBlue);
-	//TrkKnhits_Histo->SetFillColor(kBlue);
 	TrkKnhits_Histo->Draw("HIST");
 	//TrkKnhits_Histo->Draw("e1pSAME");
-	TLegend* leg_TrkKnhits = new TLegend(0.82,0.5,0.95,0.65);
+	/*TLegend* leg_TrkKnhits = new TLegend(0.82,0.5,0.95,0.65);
    	leg_TrkKnhits->SetFillColor(kWhite);
 	leg_TrkKnhits->SetFillStyle(1001);
 	leg_TrkKnhits->SetBorderSize(0);
 	//leg_TrkSnhits->AddEntry(h_leadingMuon_Pt2,"Data 2011","e1pSAME");
 	leg_TrkKnhits->AddEntry(TrkKnhits_Histo,"TrkKnhits","L");
-	leg_TrkKnhits->Draw();
+	leg_TrkKnhits->Draw();*/
+	c12->SaveAs("/eos/user/r/ragomesd/analysisB2019/canvas/Canvas12.png");
 	//-------------------------------------------------------------------------
-	c7->cd(3);
+	//Creating Canvas
+	TCanvas* c13 = new TCanvas("c13","Canvas 13 - behavior of the Pion",1200,600);
+	c13->Divide(2);
+	c13->cd(1);
 	//TrkKdxy_Histo->SetLineColor(kBlue);
 	TrkKdxy_Histo->SetMarkerStyle(7);
-	//TrkKdxy_Histo->SetMarkerStyle(21);
-	//TrkKdxy_Histo->SetStats(0);
-	//TrkKdxy_Histo->SetMarkerColor(kBlue);
-	//TrkKdxy_Histo->SetFillColor(kBlue);
 	TrkKdxy_Histo->Draw("HIST");
 	//TrkKdxy_Histo->Draw("e1pSAME");
-	TLegend* leg_TrkKdxy = new TLegend(0.82,0.5,0.95,0.65);
+	/*TLegend* leg_TrkKdxy = new TLegend(0.82,0.5,0.95,0.65);
    	leg_TrkKdxy->SetFillColor(kWhite);
 	leg_TrkKdxy->SetFillStyle(1001);
 	leg_TrkKdxy->SetBorderSize(0);
 	//leg_TrkKdxy->AddEntry(h_leadingMuon_Pt2,"Data 2011","e1pSAME");
 	leg_TrkKdxy->AddEntry(TrkKdxy_Histo,"TrkKdxy","L");
-	leg_TrkKdxy->Draw();
+	leg_TrkKdxy->Draw();*/
 	//-------------------------------------------------------------------------
-	c7->cd(4);
+	c13->cd(2);
 	//TrkKdz_Histo->SetLineColor(kBlue);
 	TrkKdz_Histo->SetMarkerStyle(7);
-	//TrkKdz_Histo->SetMarkerStyle(21);
-	//TrkKdz_Histo->SetStats(0);
-	//TrkKdz_Histo->SetMarkerColor(kBlue);
-	//TrkKdz_Histo->SetFillColor(kBlue);
 	TrkKdz_Histo->Draw("HIST");
 	//TrkKdz_Histo->Draw("e1pSAME");
-	TLegend* leg_TrkKdz = new TLegend(0.82,0.5,0.95,0.65);
+	/*TLegend* leg_TrkKdz = new TLegend(0.82,0.5,0.95,0.65);
    	leg_TrkKdz->SetFillColor(kWhite);
 	leg_TrkKdz->SetFillStyle(1001);
 	leg_TrkKdz->SetBorderSize(0);
 	//leg_TrkKdz->AddEntry(h_leadingMuon_Pt2,"Data 2011","e1pSAME");
 	leg_TrkKdz->AddEntry(TrkKdz_Histo,"TrkKdz","L");
-	leg_TrkKdz->Draw();
-//	c7->SaveAs("/eos/user/r/ragomesd/analysisB2019/Canvas7.png");
+	leg_TrkKdz->Draw();*/
+	c13->SaveAs("/eos/user/r/ragomesd/analysisB2019/canvas/Canvas13.png");
 	//=========================================================================	
 	//Creating Canvas
-	TCanvas* c8 = new TCanvas("c8","Canvas 8 - behavior of the Kaon",1200,600);
-	c8->Divide(2,2);
-	c8->cd(1);
+	TCanvas* c14 = new TCanvas("c14","Canvas 14 - behavior of the Kaon",1200,600);
+	c14->Divide(2);
+	c14->cd(1);
 	//TrkKeta_Histo->SetLineColor(kBlue);
 	TrkKeta_Histo->SetMarkerStyle(7);
-	//TrkKeta_Histo->SetMarkerStyle(21);
-	//TrkKeta_Histo->SetStats(0);
-	//TrkKeta_Histo->SetMarkerColor(kBlue);
-	//TrkKeta_Histo->SetFillColor(kBlue);
 	TrkKeta_Histo->Draw("HIST");
 	//TrkKeta_Histo->Draw("e1pSAME");
-	TLegend* leg_TrkKeta = new TLegend(0.82,0.5,0.95,0.65);
+	/*TLegend* leg_TrkKeta = new TLegend(0.82,0.5,0.95,0.65);
    	leg_TrkKeta->SetFillColor(kWhite);
 	leg_TrkKeta->SetFillStyle(1001);
 	leg_TrkKeta->SetBorderSize(0);
 	//leg_TrkKeta->AddEntry(h_leadingMuon_Pt2,"Data 2011","e1pSAME");
 	leg_TrkKeta->AddEntry(TrkKeta_Histo,"TrkKeta","L");
-	leg_TrkKeta->Draw();
+	leg_TrkKeta->Draw();*/
 	//-------------------------------------------------------------------------
-	c8->cd(2);
+	c14->cd(2);
 	//TrkKphi_Histo->SetLineColor(kBlue);
 	TrkKphi_Histo->SetMarkerStyle(7);
-	//TrkKphi_Histo->SetMarkerStyle(21);
-	//TrkTrkKphiSphi_Histo->SetStats(0);
-	//TrkKphi_Histo->SetMarkerColor(kBlue);
-	//TrkKphi_Histo->SetFillColor(kBlue);
 	TrkKphi_Histo->Draw("HIST");
 	//TrkKphi_Histo->Draw("e1pSAME");
-	TLegend* leg_TrkKphi = new TLegend(0.82,0.5,0.95,0.65);
+	/*TLegend* leg_TrkKphi = new TLegend(0.82,0.5,0.95,0.65);
    	leg_TrkKphi->SetFillColor(kWhite);
 	leg_TrkKphi->SetFillStyle(1001);
 	leg_TrkKphi->SetBorderSize(0);
 	//leg_TrkKphi->AddEntry(h_leadingMuon_Pt2,"Data 2011","e1pSAME");
 	leg_TrkKphi->AddEntry(TrkKphi_Histo,"TrkKphi","L");
-	leg_TrkKphi->Draw();
+	leg_TrkKphi->Draw();*/
+	c14->SaveAs("/eos/user/r/ragomesd/analysisB2019/canvas/Canvas14.png");
 	//-------------------------------------------------------------------------
-	c8->cd(3);
+	//Creating Canvas
+	TCanvas* c15 = new TCanvas("c15","Canvas 15 - behavior of the Pion",1200,600);
+	c15->Divide(2);
+	c15->cd(1);
 	//TrkKchi2_Histo->SetLineColor(kBlue);
 	TrkKchi2_Histo->SetMarkerStyle(7);
-	//TrkKchi2_Histo->SetMarkerStyle(21);
-	//TrkTrkKchi2Sphi_Histo->SetStats(0);
-	//TrkKchi2_Histo->SetMarkerColor(kBlue);
-	//TrkKchi2_Histo->SetFillColor(kBlue);
 	TrkKchi2_Histo->Draw("HIST");
 	//TrkKchi2_Histo->Draw("e1pSAME");
-	TLegend* leg_TrkKchi2 = new TLegend(0.82,0.5,0.95,0.65);
+	/*TLegend* leg_TrkKchi2 = new TLegend(0.82,0.5,0.95,0.65);
    	leg_TrkKchi2->SetFillColor(kWhite);
 	leg_TrkKchi2->SetFillStyle(1001);
 	leg_TrkKchi2->SetBorderSize(0);
 	//leg_TrkKchi2->AddEntry(h_leadingMuon_Pt2,"Data 2011","e1pSAME");
 	leg_TrkKchi2->AddEntry(TrkKchi2_Histo,"TrkKchi2","L");
-	leg_TrkKchi2->Draw();
-//	c8->SaveAs("/eos/user/r/ragomesd/analysisB2019/Canvas8.png");
+	leg_TrkKchi2->Draw();*/
+	c15->SaveAs("/eos/user/r/ragomesd/analysisB2019/canvas/Canvas15.png");
+	}//End Meson Flag
+	}//End VectorsHistograms Flag
 }//end program
 

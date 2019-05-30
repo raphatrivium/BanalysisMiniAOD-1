@@ -11,7 +11,7 @@ process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condD
 process.GlobalTag.globaltag = "101X_dataRun2_Prompt_v9"
 
 #number of events (-1 -> all)
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1))
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(1000))
 
 process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True),
 IgnoreCompletely = cms.untracked.vstring('ProductNotFound'),
@@ -26,7 +26,12 @@ process.source = cms.Source("PoolSource",
 #'root://cmsxrootd.fnal.gov//store/data/Run2018A/ParkingBPH1/MINIAOD/14May2018-v1/30000/129EAF02-B85A-E811-AC4E-0CC47A1DF818.root'
 #'root://cmsxrootd.fnal.gov//store/data/Run2018A/ParkingBPH1/MINIAOD/14May2018-v1/30000/02992D8C-205A-E811-8049-0025905C54C6.root'
 #'file:129EAF02-B85A-E811-AC4E-0CC47A1DF818.root' #Data mniAOD
-'file:EA334703-C759-E811-B440-008CFAE45030.root'
+'file:EA334703-C759-E811-B440-008CFAE45030_BParking1.root'
+#'file:F800AD57-C458-E811-AC54-0025904C67B4_BParking2.root'
+#'file:E0B15542-285A-E811-A365-001E67E71D03_BParking3.root'
+#'file:FCC64175-325A-E811-A1EF-FA163E17FD8B_BParking4.root'
+#'file:FCB39B8B-FE58-E811-B8D3-FA163EF8FD87_BParking5.root'
+#'file:FCEDA0BD-3F5B-E811-98D6-68B59972BF74_BParking6.root'
 	   )
 )
 #===================================================================
@@ -37,20 +42,26 @@ process.analysis = cms.EDAnalyzer('DstarD0TTree',
     doRec=cms.bool(True),
     bits = cms.InputTag("TriggerResults","","HLT"),
     prescales = cms.InputTag("patTrigger"),
-    #PathName = cms.untracked.string("HLT_Mu12_IP6_part0_v"), #ParkingBPH1 ######
-    #PathName = cms.untracked.string("HLT_Mu7_IP4_part0_v"), #ParkingBPH1  ########
-    #PathName = cms.untracked.string("HLT_Mu8_IP3_part0_v"), #ParkingBPH1  v1
-    #PathName = cms.untracked.string("HLT_Mu8_IP5_part0_v"), #ParkingBPH1 ########
-    #PathName = cms.untracked.string("HLT_Mu8_IP6_part0_v"), #ParkingBPH1 ########
-    #PathName = cms.untracked.string("HLT_Mu9_IP0_part0_v"), #ParkingBPH1 ########
-    #PathName = cms.untracked.string("HLT_Mu9_IP3_part0_v"), #ParkingBPH1 #######
-    #PathName = cms.untracked.string("HLT_Mu9_IP4_part0_v"), #ParkingBPH1 #######
-    #PathName = cms.untracked.string("HLT_Mu9_IP5_part0_v"), #ParkingBPH1 ########
-    #PathName = cms.untracked.string("HLT_Mu9_IP5_part0_v"), #ParkingBPH1 ######## 
-    PathName = cms.untracked.string("HLT_Mu9_IP6_part0_v"),  #ParkingBPH1 ----
+    #PathName = cms.untracked.string("HLT_Mu8_IP3_part0_v"), #ParkingBPH1
+    PathName = cms.untracked.string("HLT_Mu9_IP6_part0_v"),  #ParkingBPH1
+	
+	#PathName = cms.untracked.string("HLT_Mu8_IP3_part1_v"),  #ParkingBPH2
+	#PathName = cms.untracked.string("HLT_Mu9_IP6_part1_v"),  #ParkingBPH2
+	
+	#PathName = cms.untracked.string("HLT_Mu8_IP3_part2_v"),  #ParkingBPH3
+	#PathName = cms.untracked.string("HLT_Mu9_IP6_part2_v"),  #ParkingBPH3
 
-    tracks = cms.InputTag('packedPFCandidates'),#Minia AOD
-    recVtxs = cms.InputTag('offlineSlimmedPrimaryVertices'), #Mini AOD
+	#PathName = cms.untracked.string("HLT_Mu8_IP3_part3_v"),  #ParkingBPH4
+	#PathName = cms.untracked.string("HLT_Mu9_IP6_part3_v"),  #ParkingBPH4
+	
+	#PathName = cms.untracked.string("HLT_Mu8_IP3_part4_v"),  #ParkingBPH5
+	#PathName = cms.untracked.string("HLT_Mu9_IP6_part4_v"),  #ParkingBPH5
+
+	#PathName = cms.untracked.string("HLT_Mu8_IP3_part5_v"),  #ParkingBPH6
+	#PathName = cms.untracked.string("HLT_Mu9_IP6_part5_v"),  #ParkingBPH6
+
+    tracks = cms.InputTag('packedPFCandidates'),#MiniAOD
+    recVtxs = cms.InputTag('offlineSlimmedPrimaryVertices'), #MiniAOD
     genParticles = cms.InputTag('genParticles'),
     ParticleFlowTag = cms.InputTag("particleFlow"),
     # Options
